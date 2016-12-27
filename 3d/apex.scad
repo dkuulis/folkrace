@@ -80,7 +80,11 @@ module platform() {
         union() {
             #linear_extrude(height = 3)
                 difference() {
-                    offset(20) offset(-20) base_plate();
+                    offset(20) offset(-20) 
+                       polygon([
+                         [-79,25], [-70,25],[-44,60],[44,60],[70,23], [79,23],
+                         [79,-23], [70,-23],[44,-60],[-44,-60],[-70,-25], [-79,-25]
+                       ]);
                     
                     offset(5) offset(-10) polygon([
                         [-54,40],[29,40],[29,-40],[-54,-40]
@@ -182,4 +186,17 @@ module fullh() {
     translate ([-10, -35, 55]) rotate([0, 0, -60]) hsonar();      
 }
 
-fullv();
+module fullb() {
+    car();
+    
+    translate ([68, 0, 55]) hsonar();
+    translate ([40, 40, 55]) rotate([0, 0, 30]) hsonar();
+    translate ([40, -40, 55]) rotate([0, 0, -30]) hsonar();  
+    
+    translate ([5, 50, 40]) rotate([180, 0, 60]) hsonar();
+    translate ([5, -50, 40]) rotate([180, 0, -60]) hsonar();        
+}
+
+fullb();
+
+//projection(cut=true) translate ([0, 0, -47]) platform();
