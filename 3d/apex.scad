@@ -1,5 +1,7 @@
-$fs = 0.1;
-$fa = 5;
+//$fs = 0.1;
+//$fa = 5;
+$fs = 0.25;
+$fa = 8;
 
 use <hcsr04.scad>
 
@@ -82,7 +84,7 @@ module platform() {
     difference() {
     color("black") translate ([0, 0, 12+32+4]) difference() {
         union() {
-            linear_extrude(height = 3) intersection() {
+            #linear_extrude(height = 3) intersection() {
                 difference() {
                     offset(-10) offset(30) offset(-20) 
                        polygon([
@@ -91,6 +93,13 @@ module platform() {
                        ]);
                     
                     offset(5) offset(-5) translate ([-2.5, 0, 0]) difference() {
+                        polygon([
+                         [-50,-35], [50,-35], 
+                           [50,-30], [60,-15],[60,15], [50,30],
+                         [50,35], [-50,35],
+                           [-50,30], [-55,20],[-55,-20], [-50,-30]
+                        ])
+                        
                         square(size=[90,70], center=true);
                         translate ([-45, -35, 0]) circle(r=7.5, center=true);
                         translate ([ 45, -35, 0]) circle(r=7.5, center=true);                    translate ([-45,  35, 0]) circle(r=7.5, center=true);                    translate ([ 45,  35, 0]) circle(r=7.5, center=true);                }
@@ -134,8 +143,8 @@ module platform() {
         translate ([ (45-2.5)-2.5, -(35-2.5), 0]) cylinder(d=2.2, h=10, center=true);
 
         // servo wire hole
-        translate ([55, -20, 0]) cylinder(d=10, h=10, center=true);
-        translate ([55,  20, 0]) cylinder(d=10, h=10, center=true);
+        //translate ([55, -20, 0]) cylinder(d=10, h=10, center=true);
+        //translate ([55,  20, 0]) cylinder(d=10, h=10, center=true);
         
         // mount holes
         // front
@@ -161,13 +170,13 @@ module platform() {
 module board() {
     
     // base
-    color("yellow") translate ([-2.5, 0, 43]) cube(size=[90, 70, 1.2], center=true);    
+    color("yellow") translate ([-2.5, 0, 47]) cube(size=[90, 70, 1.2], center=true);    
 
     // teensy
-    color("green") translate ([-25, 0, 43+5]) cube(size=[20, 63, 10], center=true);    
+    color("green") translate ([-25, 0, 47+5]) cube(size=[20, 63, 10], center=true);    
     
     // MPU-9250
-    color("red") translate ([0, 15, 43+5]) cube(size=[20, 20, 10], center=true);    
+    color("red") translate ([0, 15, 47+5]) cube(size=[20, 20, 10], center=true);    
 }
 
 
@@ -307,11 +316,11 @@ module fullh() {
 
 module arrangebottom(a) {
     translate ([68, 0, 57]) children();
-    translate ([40, 40, 57]) rotate([0, 0, a]) children();
-    translate ([40, -40, 57]) rotate([0, 0, -a]) children();
+    translate ([45, 45, 57]) rotate([0, 0, a]) children();
+    translate ([45, -45, 57]) rotate([0, 0, -a]) children();
     
-    translate ([5, 52.5, 42]) rotate([180, 0, 2*a]) children();
-    translate ([5, -52.5, 42]) rotate([180, 0, -2*a]) children(); 
+    translate ([0, 52.5, 42]) rotate([180, 0, 2*a]) children();
+    translate ([0, -52.5, 42]) rotate([180, 0, -2*a]) children(); 
 }
 
 module fullb() {
