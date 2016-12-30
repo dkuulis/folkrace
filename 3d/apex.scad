@@ -1,3 +1,6 @@
+$fs = 0.1;
+$fa = 5;
+
 use <hcsr04.scad>
 
 module wheel() {
@@ -32,11 +35,11 @@ module base() {
         // shaft
         translate ([0, 0, 23/2]) cube(size=[158, 12, 23], center=true);
         //shaft ribs
-        translate ([14, 4, 23]) cube(size=[65, 2, 4], center=false);
-        translate ([14, -6, 23]) cube(size=[65, 2, 4], center=false);
+        translate ([14, 4, 23]) cube(size=[67, 2, 4], center=false);
+        translate ([14, -6, 23]) cube(size=[67, 2, 4], center=false);
         translate ([0, 0, 23/2]) cube(size=[158, 12, 23], center=true);
-        translate ([-79, 4, 23]) cube(size=[43, 2, 6], center=false);
-        translate ([-79, -6, 23]) cube(size=[43, 2, 6], center=false);        
+        translate ([-81, 4, 23]) cube(size=[45, 2, 6], center=false);
+        translate ([-81, -6, 23]) cube(size=[45, 2, 6], center=false);        
         // servo 
         linear_extrude(height = 15)  polygon([
             [29,0], [79,0],
@@ -58,12 +61,12 @@ module base() {
         translate ([-5/2, 20, 22]) cube(size=[110, 13, 2], center=true);
 
         // front shocks
-        translate ([79, 0, 0]) rotate([90, 0, 90]) linear_extrude(height = 16)
-            polygon([[23,41], [-23,41],[-38,0],[38,0]]);
+        translate ([162/2, 0, 0]) rotate([90, 0, 90]) linear_extrude(height = 16)
+            polygon([[23,44],[18,48],[5,41],[-5,41],[-18,48],[-23,44], [-38,0],[38,0]]);
 
         // rear shocks
-        translate ([-79-16, 0, 0]) rotate([90, 0, 90]) linear_extrude(height = 16)
-            polygon([[25,45], [-25,45],[-38,0],[38,0]]);
+        translate ([-162/2-16, 0, 0]) rotate([90, 0, 90]) linear_extrude(height = 16)
+            polygon([[25,48],[20,48],[5,38],[-5,38],[-20,48],[-25,48], [-38,0],[38,0]]);
     }
 }
 
@@ -76,48 +79,104 @@ module base_plate() {
 
 module platform() {
 
-    color("black") translate ([0, 0, 46]) difference() {
+    difference() {
+    color("black") translate ([0, 0, 12+32+4]) difference() {
         union() {
-            #linear_extrude(height = 3)
+            linear_extrude(height = 3) intersection() {
                 difference() {
-                    offset(20) offset(-20) 
+                    offset(-10) offset(30) offset(-20) 
                        polygon([
-                         [-79,25], [-70,25],[-44,60],[44,60],[70,23], [79,23],
-                         [79,-23], [70,-23],[44,-60],[-44,-60],[-70,-25], [-79,-25]
+                         [-200,25], [-70,25],[-44,60],[44,60],[70,23], [200,23],
+                         [200,-23], [70,-23],[44,-60],[-44,-60],[-70,-25], [-200,-25]
                        ]);
                     
-                    offset(5) offset(-10) polygon([
-                        [-54,40],[29,40],[29,-40],[-54,-40]
-                    ]);
-                }
+                    offset(5) offset(-5) translate ([-2.5, 0, 0]) difference() {
+                        square(size=[90,70], center=true);
+                        translate ([-45, -35, 0]) circle(r=7.5, center=true);
+                        translate ([ 45, -35, 0]) circle(r=7.5, center=true);                    translate ([-45,  35, 0]) circle(r=7.5, center=true);                    translate ([ 45,  35, 0]) circle(r=7.5, center=true);                }
+                    
+                } 
+                square(size=[162,120], center=true);
+            }
                
-            // shock tower mount points
-            translate ([-79, -25, 0]) cube(size=[5, 50, 11], center=false);    
-            translate ([79-5, -23, 0]) cube(size=[5, 46, 7], center=false);    
 
-            // joint mount plates to body
-            translate ([-79, -25, 0]) cube(size=[15, 50, 3], center=false);    
-            translate ([79-15, -23, 0]) cube(size=[15, 46, 3], center=false);    
+            intersection() { translate ([0, 0, 100]) cube(size=[200,200,200], center=true); union() {
+            // shock tower mount points 
+            // rear
+            #translate ([-81, -25, 0]) { hull() {
+                cube(size=[4, 7, 12-3.5], center=false);
+                translate ([4/2, 3.5, 12-3.5]) rotate([90, 0, 90]) cylinder(d=7, h=4, center=true);
+            }
+            translate ([8/2, 3.5, 12-3.5-6]) rotate([90, 0, 90]) cylinder(d=6, h=8, center=true);
+            }
+            #translate ([-81, 25-7, 0]) { hull() {
+                cube(size=[4, 7, 12-3.5], center=false);
+                translate ([4/2, 7-3.5, 12-3.5]) rotate([90, 0, 90]) cylinder(d=7, h=4, center=true);
+            }
+            translate ([8/2, 7-3.5, 12-3.5-6]) rotate([90, 0, 90]) cylinder(d=6, h=8, center=true);
+            }
+            // front   
+            #translate ([81-4, -46/2, 0]) hull() {
+                cube(size=[4, 7, 8-3.5], center=false);
+                translate ([4/2, 3.5, 8-3.5]) rotate([90, 0, 90]) cylinder(d=7, h=4, center=true);
+            }
+            #translate ([81-4, 46/2-7, 0]) hull() {
+                cube(size=[4, 7, 8-3.5], center=false);
+                translate ([4/2, 7-3.5, 8-3.5]) rotate([90, 0, 90]) cylinder(d=7, h=4, center=true);
+            }
+            }}
         }
         
         // board mount holes
-        #translate ([-54, 31, 0])  cylinder(d=3.2, h=10, center=true);
-        #translate ([-54, -31, 0]) cylinder(d=3.2, h=10, center=true);
-        #translate ([29, 31, 0])   cylinder(d=3.2, h=10, center=true);
-        #translate ([29, -31, 0])  cylinder(d=3.2, h=10, center=true);
+        translate ([-(45-2.5)-2.5,  (35-2.5), 0]) cylinder(d=2.2, h=10, center=true);
+        translate ([-(45-2.5)-2.5, -(35-2.5), 0]) cylinder(d=2.2, h=10, center=true);
+        translate ([ (45-2.5)-2.5,  (35-2.5), 0]) cylinder(d=2.2, h=10, center=true);
+        translate ([ (45-2.5)-2.5, -(35-2.5), 0]) cylinder(d=2.2, h=10, center=true);
+
+        // servo wire hole
+        translate ([55, -20, 0]) cylinder(d=10, h=10, center=true);
+        translate ([55,  20, 0]) cylinder(d=10, h=10, center=true);
+        
+        // mount holes
+        // front
+        #translate ([81, 42.5/2-3/2, 8-2-3/2]) rotate([90, 0, 90]) cylinder(d=3, h=20, center=true);
+        #translate ([81,-42.5/2+3/2, 8-2-3/2]) rotate([90, 0, 90]) cylinder(d=3, h=20, center=true);       
+        #translate ([81, 42.5/2-3/2, 8-2-3/2-6]) rotate([90, 0, 90]) cylinder(d=3, h=12, center=true);
+        #translate ([81,-42.5/2+3/2, 8-2-3/2-6]) rotate([90, 0, 90]) cylinder(d=3, h=12, center=true);   
+        
+        #translate ([81-4-5/2, 42.5/2-3/2, 8-2-3/2]) rotate([90, 0, 90]) cylinder(d=6.1, h=5, center=true);
+        #translate ([81-4-5/2,-42.5/2+3/2, 8-2-3/2]) rotate([90, 0, 90]) cylinder(d=6.1, h=5, center=true);        
+        
+        // rear
+        #translate ([-81, 46.5/2-3/2, 12-2-3/2]) rotate([90, 0, 90]) cylinder(d=3, h=20, center=true);
+        #translate ([-81,-46.5/2+3/2, 12-2-3/2]) rotate([90, 0, 90]) cylinder(d=3, h=20, center=true); 
+        #translate ([-81, 46.5/2-3/2, 12-2-3/2-6]) rotate([90, 0, 90]) cylinder(d=3, h=12, center=true);
+        #translate ([-81,-46.5/2+3/2, 12-2-3/2-6]) rotate([90, 0, 90]) cylinder(d=3, h=12, center=true);     
+    }
+    arrangebottom(30) hbaseholes(center=true);
+    //arrangebottom(45) hbaseholes();
     }
 }
 
 module board() {
     
     // base
-    color("yellow") translate ([-12.5, 0, 45]) cube(size=[90, 70, 1], center=true);    
+    color("yellow") translate ([-2.5, 0, 43]) cube(size=[90, 70, 1.2], center=true);    
 
     // teensy
-    color("green") translate ([-25, 0, 45+5]) cube(size=[20, 63, 10], center=true);    
+    color("green") translate ([-25, 0, 43+5]) cube(size=[20, 63, 10], center=true);    
     
     // MPU-9250
-    color("red") translate ([0, 15, 45+5]) cube(size=[20, 20, 10], center=true);    
+    color("red") translate ([0, 15, 43+5]) cube(size=[20, 20, 10], center=true);    
+}
+
+
+module esc() {
+    color("green") cube(size=[36, 26, 2], center=true);    
+    color("black") translate ([36/2, 0, 0]) rotate([0, 90, 0]) cylinder(d=8, h=16, center=false);
+
+    // esc support box ?
+    // hcolor("black") translate ([0, 0, -11]) cube(size=[30, 20, 20], center=true);
 }
 
 module vsonar() {
@@ -133,12 +192,74 @@ module vsonar() {
     //color("white") translate ([20+1000/2, 0, 22.5]) rotate([0, 90, 0]) cylinder(d1=40, d2=520,h=1000, center=true);
 }
 
-module esc() {
-    color("green") cube(size=[36, 26, 2], center=true);    
-    color("black") translate ([36/2, 0, 0]) rotate([0, 90, 0]) cylinder(d=8, h=16, center=false);
+module hbaseholes(center = false)
+{
+    translate ([-5,   0, -15]) cylinder(d=3.2, h=15, center=false);  
+    if (!center) {    
+        translate ([-5,  19, -15]) cylinder(d=3.2, h=15, center=false);            
+        translate ([-5, -19, -15]) cylinder(d=3.2, h=15, center=false);    
+    }
+}
 
-    // esc support box ?
-    // hcolor("black") translate ([0, 0, -11]) cube(size=[30, 20, 20], center=true);
+module hmount() {
+    // mount plate
+    color ("gray") {
+    
+        // front
+        difference() {
+            translate ([1.5, -48/2, -6]) #hull() {
+                cube(size=[3, 48, 22], center=false);
+                translate ([0, 43, 22]) rotate([90, 0, 90]) cylinder(r=5, h=3, center=false);
+                translate ([0, 5, 22]) rotate([90, 0, 90]) cylinder(r=5, h=3, center=false);
+            }
+           
+            translate ([0, -45/2, 0]) rotate([90, 0, 90]) {
+                
+                // sonar
+                translate([16/2+1,18/2+1,1.3]) cylinder(d=16.5, h=15);
+                translate([16/2+27+1,18/2+1,1.3]) cylinder(d=16.5, h=15);            
+                
+                //xtal(s)
+                translate([45/2-3.25,20-4,1.3]) hull()
+                {
+                    translate([0,0,0]) cylinder(d=5, h=5);
+                    translate([6.5,0,0]) cylinder(d=5, h=5);
+                }
+                translate([45/2-3.25, 4,1.3]) hull()
+                {
+                    translate([0,0,0]) cylinder(d=5, h=5);
+                    translate([6.5,0,0]) cylinder(d=5, h=5);
+                }
+                
+                // screws
+                translate([2.5,2.5,4.5]) screw2x6bore();
+                translate([2.5+40,2.5+15,4.5]) screw2x6bore();
+                translate([2.5+40,2.5,4.5]) screw2x6bore();
+                translate([2.5,2.5+15,4.5]) screw2x6bore();
+            }
+
+            translate ([3, 0, 10]) 
+                cube(size=[5, 20, 9], center=true);
+        }
+
+        //base
+        difference() {
+            #hull() {
+                translate ([-3.5, -48/2, -6]) cube(size=[5, 48, 5], center=false);
+                translate ([-3.5, -48/2+5, -6]) cylinder(r=5, h=5, center=false);
+                translate ([-3.5, 48/2-5, -6]) cylinder(r=5, h=5, center=false);
+            }
+            #hbaseholes();
+        }
+    }
+}
+
+module screw2x6bore() {
+    rotate([180, 0, 0]) {
+        cylinder(d=2, h=6);
+        translate ([0, 0, -1.3]) 
+            cylinder(d1=2*3.6, d2=0, h=2*1.3);
+    }
 }
 
 module hsonar() {
@@ -146,9 +267,7 @@ module hsonar() {
     // horizontal sonar
     translate ([0, -45/2, 0]) rotate([90, 0, 90]) hcsr04();
     
-    // mount plate
-    color("gray") translate ([1.5, -45/2, -6]) cube(size=[3, 45, 26], center=false);
-    color("gray") translate ([-8.5, -45/2, -6]) cube(size=[10, 45, 5], center=false);
+    hmount();    
     
     // sonar ray
     //color("white") translate ([20+1000/2, 0, 10]) rotate([0, 90, 0]) cylinder(d1=40, d2=520,h=1000, center=true);
@@ -186,17 +305,26 @@ module fullh() {
     translate ([-10, -35, 55]) rotate([0, 0, -60]) hsonar();      
 }
 
-module fullb() {
-    car();
+module arrangebottom(a) {
+    translate ([68, 0, 57]) children();
+    translate ([40, 40, 57]) rotate([0, 0, a]) children();
+    translate ([40, -40, 57]) rotate([0, 0, -a]) children();
     
-    translate ([68, 0, 55]) hsonar();
-    translate ([40, 40, 55]) rotate([0, 0, 30]) hsonar();
-    translate ([40, -40, 55]) rotate([0, 0, -30]) hsonar();  
-    
-    translate ([5, 50, 40]) rotate([180, 0, 60]) hsonar();
-    translate ([5, -50, 40]) rotate([180, 0, -60]) hsonar();        
+    translate ([5, 52.5, 42]) rotate([180, 0, 2*a]) children();
+    translate ([5, -52.5, 42]) rotate([180, 0, -2*a]) children(); 
 }
 
-fullb();
+module fullb() {
+    car();
+    arrangebottom(30) hsonar();
+}
+
+platform();
+
+//fullb();
+
+//translate ([0, 0, 4.5]) rotate([0, 90, 0]) hmount();
+
+//screw2x6bore();
 
 //projection(cut=true) translate ([0, 0, -47]) platform();
