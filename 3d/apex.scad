@@ -165,7 +165,14 @@ module platform() {
         #translate ([-81, 46.5/2-3/2, 12-2-3/2-6]) rotate([90, 0, 90]) cylinder(d=3, h=12, center=true);
         #translate ([-81,-46.5/2+3/2, 12-2-3/2-6]) rotate([90, 0, 90]) cylinder(d=3, h=12, center=true);
     }
-    arrangebottom(30) hbaseholes(center=true);
+    arrangebottom(30) 
+    {
+        hbaseholes(center=true, right=1, left=1);
+        hbaseholes(center=true, right=0, left=1);
+        hbaseholes(center=true, right=1, left=0);
+        hbaseholes(center=true, right=1, left=0);
+        hbaseholes(center=true, right=0, left=1);
+    }
     //arrangebottom(45) hbaseholes();
     }
 }
@@ -204,15 +211,15 @@ module vsonar() {
     //color("white") translate ([20+1000/2, 0, 22.5]) rotate([0, 90, 0]) cylinder(d1=40, d2=520,h=1000, center=true);
 }
 
-module hbaseholes(center = false)
+module hbaseholes(center = true, left = 2, right = 2)
 {
-    translate ([-5,    0, -15]) cylinder(d=3.2, h=15, center=false);
-    translate ([-5,  9.5, -15]) cylinder(d=3.2, h=15, center=false);
-    translate ([-5, -9.5, -15]) cylinder(d=3.2, h=15, center=false);
-    if (!center) {
-        translate ([-5,  19, -15]) cylinder(d=3.2, h=15, center=false);
-        translate ([-5, -19, -15]) cylinder(d=3.2, h=15, center=false);
-    }
+    if (center) translate ([-5,    0, -15]) cylinder(d=3.2, h=15, center=false);
+
+    if (left >= 1) translate ([-5,  9.5, -15]) cylinder(d=3.2, h=15, center=false);
+    if (left >= 2) translate ([-5,  19, -15]) cylinder(d=3.2, h=15, center=false);
+
+    if (right >= 1) translate ([-5, -9.5, -15]) cylinder(d=3.2, h=15, center=false);
+    if (right >= 2) translate ([-5, -19, -15]) cylinder(d=3.2, h=15, center=false);
 }
 
 module hmount() {
@@ -324,12 +331,13 @@ module fullh() {
 }
 
 module arrangebottom(a) {
-    translate ([68, 0, 57]) children();
-    translate ([45, 45, 57]) rotate([0, 0, a]) children();
-    translate ([45, -45, 57]) rotate([0, 0, -a]) children();
+    translate ([68, 0, 57]) if ($children == 1) children(); else children(0);
 
-    translate ([0, 52.5, 42]) rotate([180, 0, 2*a]) children();
-    translate ([0, -52.5, 42]) rotate([180, 0, -2*a]) children();
+    translate ([45, 45, 57]) rotate([0, 0, a]) if ($children == 1) children(); else children(1);
+    translate ([0, 52.5, 42]) rotate([180, 0, 2*a]) if ($children == 1) children(); else children(2);
+
+    translate ([45, -45, 57]) rotate([0, 0, -a]) if ($children == 1) children(); else children(3);
+    translate ([0, -52.5, 42]) rotate([180, 0, -2*a]) if ($children == 1) children(); else children(4);
 }
 
 module fullb() {
@@ -339,7 +347,7 @@ module fullb() {
 
 //car();
 
-//platform();
+platform();
 
 /*
 intersection() {
@@ -362,7 +370,7 @@ platform();
 
 //fullb();
 
-translate ([0, 0, 4.5]) rotate([0, 90, 0]) hmount();
+//translate ([0, 0, 4.5]) rotate([0, 90, 0]) hmount();
 
 //screw2x6bore();
 
