@@ -206,7 +206,9 @@ module vsonar() {
 
 module hbaseholes(center = false)
 {
-    translate ([-5,   0, -15]) cylinder(d=3.2, h=15, center=false);
+    translate ([-5,    0, -15]) cylinder(d=3.2, h=15, center=false);
+    translate ([-5,  9.5, -15]) cylinder(d=3.2, h=15, center=false);
+    translate ([-5, -9.5, -15]) cylinder(d=3.2, h=15, center=false);
     if (!center) {
         translate ([-5,  19, -15]) cylinder(d=3.2, h=15, center=false);
         translate ([-5, -19, -15]) cylinder(d=3.2, h=15, center=false);
@@ -220,35 +222,38 @@ module hmount() {
         // front
         difference() {
             translate ([1.5, -48/2, -6]) #hull() {
-                cube(size=[3, 48, 23], center=false);
-                translate ([0, 43, 23]) rotate([90, 0, 90]) cylinder(r=5, h=3, center=false);
-                translate ([0, 5, 23]) rotate([90, 0, 90]) cylinder(r=5, h=3, center=false);
+                cube(size=[3, 48, 25], center=false);
+                translate ([0, 48-3, 25]) rotate([90, 0, 90]) cylinder(r=3, h=3, center=false);
+                translate ([0, 3, 25]) rotate([90, 0, 90]) cylinder(r=3, h=3, center=false);
             }
 
             translate ([0, -45/2, 0]) rotate([90, 0, 90]) {
 
                 // sonar
-                translate([16/2+1,18/2+1,1.3]) cylinder(d=17, h=15);
-                translate([16/2+27+1,18/2+1,1.3]) cylinder(d=17, h=15);
+                translate([45/2-(42-16)/2,18/2+1,1.3]) cylinder(d=17, h=15);
+                translate([45/2+(42-16)/2,18/2+1,1.3]) cylinder(d=17, h=15);
 
                 //xtal(s)
-                translate([45/2-3.25,20-4,1.3]) hull()
-                {
-                    translate([0,0,0]) cylinder(d=6, h=5);
-                    translate([6.5,0,0]) cylinder(d=6, h=5);
+                hull () {
+                    translate([45/2-3.25,20-3.5,1.3])
+                    {
+                        translate([0,0,0]) cylinder(d=6, h=5);
+                        translate([6.5,0,0]) cylinder(d=6, h=5);
+                    }
+                    translate([45/2-3.25, 4,1.3]) hull()
+                    {
+                        //translate([0,0,0]) cylinder(d=6, h=5);
+                        //translate([6.5,0,0]) cylinder(d=6, h=5);
+                        translate([0,-2,0]) cylinder(d=6, h=5);
+                        translate([6.5,-2,0]) cylinder(d=6, h=5);
+                    }
                 }
-                translate([45/2-3.25, 4,1.3]) hull()
-                {
-                    translate([0,0,0]) cylinder(d=6, h=5);
-                    translate([6.5,0,0]) cylinder(d=6, h=5);
-                    translate([0,-2,0]) cylinder(d=6, h=5);
-                    translate([6.5,-2,0]) cylinder(d=6, h=5);                }
 
                 // screws
-                translate([   1.5,    1.5, 4.5-0.5]) screw2x6bore();
-                translate([45-1.5, 20-1.5, 4.5-0.5]) screw2x6bore();
-                translate([45-1.5,    1.5, 4.5-0.5]) screw2x6bore();
-                translate([   1.5, 20-1.5, 4.5-0.5]) screw2x6bore();
+                translate([   1.0,    1.0, 4.5-0.5]) screw2x6bore();
+                translate([45-1.0, 20-1.5, 4.5-0.5]) screw2x6bore();
+                translate([45-1.0,    1.0, 4.5-0.5]) screw2x6bore();
+                translate([   1.0, 20-1.5, 4.5-0.5]) screw2x6bore();
             }
 
             translate ([3, 0, 10])
@@ -334,7 +339,7 @@ module fullb() {
 
 //car();
 
-platform();
+//platform();
 
 /*
 intersection() {
@@ -357,7 +362,7 @@ platform();
 
 //fullb();
 
-//translate ([0, 0, 4.5]) rotate([0, 90, 0]) hmount();
+translate ([0, 0, 4.5]) rotate([0, 90, 0]) hmount();
 
 //screw2x6bore();
 
