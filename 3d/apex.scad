@@ -428,6 +428,19 @@ module arrangebottom(a) {
     translate ([-5, -45, 57]) rotate([0, 0, -2*a]) if ($children == 1) children(); else children(4);
 }
 
+module lcd1602() {
+translate([-15,0,78]) difference() {
+    union() {
+        translate([0,0,5+8/2]) color("blue") cube(size=[27, 72, 8], center=true);
+        #translate([0,0,4+1/2]) color("green") cube(size=[36, 80, 1], center=true);
+    }
+    #translate([ 31/2, 75/2,0]) cylinder(d=2.5, h=20, center=false);
+    #translate([-31/2, 75/2,0]) cylinder(d=2.5, h=20, center=false);
+    #translate([ 31/2,-75/2,0]) cylinder(d=2.5, h=20, center=false);
+    #translate([-31/2,-75/2,0]) cylinder(d=2.5, h=20, center=false);
+}
+}
+
 module fullb() {
     car();
     arrangebottom(30) hsonar();
@@ -441,7 +454,7 @@ module fullb() {
 //board();
 //platform();
 
-//fullb();
+fullb();
 
 //translate ([0, 0, 4.5]) rotate([0, 90, 0]) hmount();
 
@@ -466,7 +479,7 @@ intersection() {
 
 //screw2x6bore();
 
-rotate([0,0,180]) projection(cut=true) translate ([0, 0, -49]) platform();
+//rotate([0,0,180]) projection(cut=true) translate ([0, 0, -49]) platform();
 //projection() translate ([0, 0, 10]) hsonar();
 
 //translate([0,0,80]) rotate([180,0,0]) cage(true);
