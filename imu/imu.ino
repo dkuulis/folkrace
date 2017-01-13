@@ -57,9 +57,9 @@ class MPU9250
 
         int begin(mpu9250_accel_range accelRange, mpu9250_gyro_range gyroRange);
         int setFilter(mpu9250_dlpf_bandwidth bandwidth, uint8_t srd);
-        
+
         void MadgwickQuaternionUpdate(float* data, float t);
-        void toEulerianAngle(float* q, float& roll, float& pitch, float& yaw);        
+        void toEulerianAngle(float* q, float& roll, float& pitch, float& yaw);
 
         void getMotion10Unbiased(float* res);
         void getMotion10(float* res);
@@ -73,7 +73,7 @@ class MPU9250
         const float RAD2DEG = 180.0f/3.14159265359f;
 
         float delta = 0.0f;
-        
+
     private:
 
         // I2C address
@@ -88,7 +88,7 @@ class MPU9250
 
         // MPU9250 magnetometer pre-scaler
         float _magScaleX, _magScaleY, _magScaleZ;
-        
+
         // biases
         float bias[18] = {
             0.0f, 0.0f, 0.0f, // accel bias
@@ -100,7 +100,7 @@ class MPU9250
             0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 1.0f
         };
-        
+
         // timings
         unsigned long update = 0L;
 
@@ -108,7 +108,7 @@ class MPU9250
         const int AX = 0;
         const int AY = 1;
         const int AZ = 2;
-        
+
         const int GX = 3;
         const int GY = 4;
         const int GZ = 5;
@@ -124,13 +124,13 @@ class MPU9250
         const int QX = 1;
         const int QY = 2;
         const int QZ = 3;
-        
+
         // megnetometer scale bias indices
         // data indices
         const int MXX = 9;
         const int MXY = 10;
         const int MXZ = 11;
-        
+
         const int MYX = 12;
         const int MYY = 13;
         const int MYZ = 14;
@@ -434,7 +434,7 @@ int MPU9250::begin(mpu9250_accel_range accelRange, mpu9250_gyro_range gyroRange)
 
     // instruct the MPU9250 to get 7 bytes of data from the AK8963 at the sample rate
     readAK8963Registers(AK8963_HXL, sizeof(data), &data[0]);
-    
+
     // reset timing
     update = 0L;
     delta = 0.0f;
@@ -549,7 +549,7 @@ void MPU9250::getMotion10Counts(int16_t* res)
     // this will also read AK8963_ST2 0x09 - Data overflow bit 3 and data read error status bit 2
     // via EXT_SENS_DATA_07 0x50 register
     // not checking it now, but probably should
-    
+
     readRegisters(ACCEL_OUT, sizeof(buff), &buff[0]); // grab the data from the MPU9250
 
     // Sensors x (y)-axis of the accelerometer/gyro is aligned with the y (x)-axis of the magnetometer;
@@ -560,26 +560,26 @@ void MPU9250::getMotion10Counts(int16_t* res)
     // positive down, we need to invert the accel data, so we pass -Ax, Ay, Az, Gx, -Gy, -Gz, My, -Mx, and Mz into the Madgwick
     // function to get North along the accel +x-axis, East along the accel -y-axis, and Down along the accel -z-axis.
     // This orientation choice can be modified to allow any convenient (non-NED) orientation convention.
-    
-    // combine into 16 bit values    
+
+    // combine into 16 bit values
     // accel/gyro is arranged HIGH, then LOW
-    res[AX] = -((((int16_t)buff[0]) << 8) | buff[1]);   
-    res[AY] =  ((((int16_t)buff[2]) << 8) | buff[3]);   
-    res[AZ] =  ((((int16_t)buff[4]) << 8) | buff[5]);   
- 
-    res[GX] =  ((((int16_t)buff[8]) << 8) | buff[9]);   
-    res[GY] = -((((int16_t)buff[10]) << 8) | buff[11]); 
-    res[GZ] = -((((int16_t)buff[12]) << 8) | buff[13]); 
+    res[AX] = -((((int16_t)buff[0]) << 8) | buff[1]);
+    res[AY] =  ((((int16_t)buff[2]) << 8) | buff[3]);
+    res[AZ] =  ((((int16_t)buff[4]) << 8) | buff[5]);
+
+    res[GX] =  ((((int16_t)buff[8]) << 8) | buff[9]);
+    res[GY] = -((((int16_t)buff[10]) << 8) | buff[11]);
+    res[GZ] = -((((int16_t)buff[12]) << 8) | buff[13]);
 
     // note exchange of indices 7 (hy) and 6 (hx)
     // magnetometer is arranged LOW, then HIGH
-    res[MY] =  ((((int16_t)buff[15]) << 8) | buff[14]); 
-    res[MX] = -((((int16_t)buff[17]) << 8) | buff[16]); 
-    res[MZ] =  ((((int16_t)buff[19]) << 8) | buff[18]); 
+    res[MY] =  ((((int16_t)buff[15]) << 8) | buff[14]);
+    res[MX] = -((((int16_t)buff[17]) << 8) | buff[16]);
+    res[MZ] =  ((((int16_t)buff[19]) << 8) | buff[18]);
 
     res[TEMPERATURE] = ((((int16_t)buff[6]) << 8) | buff[7]);
-    
-    float us = micros(); 
+
+    float us = micros();
     delta = (float)(us - update) * 0.000001; // uS -> full seconds
     update = us;
 }
@@ -594,14 +594,14 @@ void MPU9250::getMotion10(float* res)
     res[AX] = ((float) buff[AX]) * _accelScale;
     res[AY] = ((float) buff[AY]) * _accelScale;
     res[AZ] = ((float) buff[AZ]) * _accelScale;
-                                              
-    res[GX] = ((float) buff[GX]) * _gyroScale; 
-    res[GY] = ((float) buff[GY]) * _gyroScale; 
-    res[GZ] = ((float) buff[GZ]) * _gyroScale; 
+
+    res[GX] = ((float) buff[GX]) * _gyroScale;
+    res[GY] = ((float) buff[GY]) * _gyroScale;
+    res[GZ] = ((float) buff[GZ]) * _gyroScale;
 
     res[MX] = ((float) buff[MX]) * _magScaleY; // y sacle - see XY swap
     res[MY] = ((float) buff[MY]) * _magScaleX; // x scale - see XY swap
-    res[MZ] = ((float) buff[MZ]) * _magScaleZ; 
+    res[MZ] = ((float) buff[MZ]) * _magScaleZ;
 
     res[TEMPERATURE] = ((((float) buff[TEMPERATURE]) - TEMPERATURE_OFFSET) * TEMPERATURE_SCALE) + TEMPERATURE_OFFSET; // t
 }
@@ -614,7 +614,7 @@ void MPU9250::getMotion10Unbiased(float* res)
     res[AX] -= bias[AX];
     res[AY] -= bias[AY];
     res[AZ] -= bias[AZ];
-                                              
+
     res[GX] -= bias[GX];
     res[GY] -= bias[GY];
     res[GZ] -= bias[GZ];
@@ -626,8 +626,8 @@ void MPU9250::getMotion10Unbiased(float* res)
     res[MX] = cmx*bias[MXX] + cmy*bias[MXY] + cmz*bias[MXZ];
     res[MY] = cmx*bias[MYX] + cmy*bias[MYY] + cmz*bias[MYZ];
     res[MZ] = cmx*bias[MZX] + cmy*bias[MZY] + cmz*bias[MZZ];
-    
-    // no bias for temperature 
+
+    // no bias for temperature
 }
 
 void MPU9250::setBias(float* b)
@@ -765,7 +765,7 @@ static float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};
 void  MPU9250::MadgwickQuaternionUpdate(float* data, float t)
 {
     if (t == 0.0f) return; // handle no timing => no update
-    
+
     // short name local variable for readability
     float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];
     float norm;
@@ -796,7 +796,7 @@ void  MPU9250::MadgwickQuaternionUpdate(float* data, float t)
     float _2q2 = 2.0f * q2;
     float _2q3 = 2.0f * q3;
     float _2q4 = 2.0f * q4;
-    
+
     float _2q1q3 = 2.0f * q1q3;
     float _2q3q4 = 2.0f * q3q4;
 
@@ -833,9 +833,9 @@ void  MPU9250::MadgwickQuaternionUpdate(float* data, float t)
     s2 = _2q4 * (2.0f * q2q4 - _2q1q3 - ax) + _2q1 * (2.0f * q1q2 + _2q3q4 - ay) - 4.0f * q2 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + _2bz * q4 * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q3 + _2bz * q1) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q4 - _4bz * q2) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
     s3 = -_2q1 * (2.0f * q2q4 - _2q1q3 - ax) + _2q4 * (2.0f * q1q2 + _2q3q4 - ay) - 4.0f * q3 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + (-_4bx * q3 - _2bz * q1) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q2 + _2bz * q4) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q1 - _4bz * q3) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
     s4 = _2q2 * (2.0f * q2q4 - _2q1q3 - ax) + _2q3 * (2.0f * q1q2 + _2q3q4 - ay) + (-_4bx * q4 + _2bz * q2) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (-_2bx * q1 + _2bz * q3) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + _2bx * q2 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
-    
+
     // normalise step magnitude
-    norm = sqrt(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);   
+    norm = sqrt(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);
     norm = 1.0f/norm;
     s1 *= norm;
     s2 *= norm;
@@ -846,7 +846,7 @@ void  MPU9250::MadgwickQuaternionUpdate(float* data, float t)
     float gx = data[3];
     float gy = data[4];
     float gz = data[5];
-    
+
     // Compute rate of change of quaternion
     qDot1 = 0.5f * (-q2 * gx - q3 * gy - q4 * gz) - beta * s1;
     qDot2 = 0.5f * (q1 * gx + q3 * gz - q4 * gy) - beta * s2;
@@ -860,7 +860,7 @@ void  MPU9250::MadgwickQuaternionUpdate(float* data, float t)
     q4 += qDot4 * t;
 
     // normalise quaternion
-    norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    
+    norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
     norm = 1.0f/norm;
     q[0] = q1 * norm;
     q[1] = q2 * norm;
@@ -889,15 +889,17 @@ void setup()
     beginStatus = IMU.begin(ACCEL_RANGE_4G, GYRO_RANGE_500DPS);
 
     float b[18] = {
-            -0.66359285f, 0.596398637f, 0.149558031f,  // accel bias
+            -0.66359285f-0.13f, 0.596398637f, 0.149558031f,  // accel bias
             -0.00336684f, -0.038908617f, -0.003352749f, // gyro bias
-            0.0f, 0.0f, 0.0f, // megnetometer bias
+
+            -7.909176574f, 10.11728131f, 22.60300639f, // megnetometer bias
 
             // magnetometer scale matrix
             1.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 1.0f
     };
+
     IMU.setBias(b);
 }
 
@@ -914,7 +916,7 @@ void loop()
     {
         // get the accel (m/s/s), gyro (rad/s), and magnetometer (uT), and temperature (C) data
         IMU.getMotion10Unbiased(d);
-        
+
         // Sensors x (y)-axis of the accelerometer/gyro is aligned with the y (x)-axis of the magnetometer;
         // the magnetometer z-axis (+ down) is misaligned with z-axis (+ up) of accelerometer and gyro!
         // We have to make some allowance for this orientation mismatch in feeding the output to the quaternion filter.
@@ -924,12 +926,12 @@ void loop()
         // function to get North along the accel +x-axis, East along the accel -y-axis, and Down along the accel -z-axis.
         // This orientation choice can be modified to allow any convenient (non-NED) orientation convention.
         // Pass gyro rate as rad/sx
-        
-        IMU.MadgwickQuaternionUpdate(d, IMU.delta);    
-  
+
+        IMU.MadgwickQuaternionUpdate(d, IMU.delta);
+
         // print the data
         printData();
-  
+
         // delay a frame
         delay(50);
     }
@@ -942,29 +944,29 @@ void printData()
     Serial.print(" "); Serial.print(d[0], 6);
     Serial.print(" "); Serial.print(d[1], 6);
     Serial.print(" "); Serial.print(d[2], 6);
-                                             
+
     Serial.print(" "); Serial.print(d[3], 6);
     Serial.print(" "); Serial.print(d[4], 6);
     Serial.print(" "); Serial.print(d[5], 6);
-                                            
+
     Serial.print(" "); Serial.print(d[6], 6);
     Serial.print(" "); Serial.print(d[7], 6);
     Serial.print(" "); Serial.print(d[8], 6);
 
-    Serial.print(" "); Serial.print(q[0], 6); 
-    Serial.print(" "); Serial.print(q[1], 6); 
-    Serial.print(" "); Serial.print(q[2], 6); 
-    Serial.print(" "); Serial.print(q[3], 6); 
-    
+    Serial.print(" "); Serial.print(q[0], 6);
+    Serial.print(" "); Serial.print(q[1], 6);
+    Serial.print(" "); Serial.print(q[2], 6);
+    Serial.print(" "); Serial.print(q[3], 6);
+
     float roll;
     float pitch;
     float yaw;
-    
+
     IMU.toEulerianAngle(q, roll, pitch, yaw);
-    
-    Serial.print(" "); Serial.print(roll, 6); 
-    Serial.print(" "); Serial.print(pitch, 6); 
-    Serial.print(" "); Serial.print(yaw, 6); 
+
+    Serial.print(" "); Serial.print(roll, 6);
+    Serial.print(" "); Serial.print(pitch, 6);
+    Serial.print(" "); Serial.print(yaw, 6);
 
     /*
     Serial.print(" "); Serial.print(d[TEMPERATURE],6); // t
@@ -990,7 +992,7 @@ void MPU9250::toEulerianAngle(float* q, float& roll, float& pitch, float& yaw)
 
     // yaw (z-axis rotation)
     float t3 = +2.0f * (q[QW] * q[QZ] + q[QX] *q[QY]);
-    float t4 = +1.0f - 2.0f * (ysqr + q[QZ] * q[QZ]);  
+    float t4 = +1.0f - 2.0f * (ysqr + q[QZ] * q[QZ]);
     yaw = atan2(t3, t4) * RAD2DEG;
 }
 
