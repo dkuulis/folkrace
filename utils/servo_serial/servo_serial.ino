@@ -2,7 +2,8 @@
 
 #include <Servo.h>
 
-#define SERVO_PIN 9 // change as needed
+#define SERVO_PIN 5 // change as needed
+//#define SERVO_PIN 30 // change as needed
 
 Servo srv;
 
