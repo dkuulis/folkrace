@@ -3,8 +3,8 @@
 void setup()
 {
     Serial.begin(115200);
-    Serial.println(F("Starting up"));    
-    
+    Serial.println(F("Starting up"));
+
     // component setups
     ledSetup();
     btSerialSetup();

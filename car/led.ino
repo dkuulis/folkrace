@@ -23,14 +23,14 @@ void ledLoop(unsigned long time, int buttonState)
         state = !state; // change state to blink
 
         // no blinking on non-blue LEDs if button is pressed
-        int otherState = buttonState ? LOW : state; 
+        int otherState = buttonState ? LOW : state;
 
         digitalWrite(LED_PIN, otherState);
         digitalWrite(RED_LED_PIN, otherState);
         digitalWrite(YELLOW_LED_PIN, otherState);
         digitalWrite(GREEN_LED_PIN, otherState);
 
-        // blues always blink 
+        // blues always blink
         digitalWrite(LEFT_BLUE_LED_PIN, state);
         digitalWrite(RIGHT_BLUE_LED_PIN, state);
     }

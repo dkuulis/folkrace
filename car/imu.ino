@@ -11,11 +11,11 @@ float d[10];
 void imuSetup()
 {
     int status = IMU.begin(ACCEL_RANGE_4G, GYRO_RANGE_500DPS);
-    
-    if (!status) 
+
+    if (!status)
     {
         setupFail("IMU initialization unsuccessful");
-    }    
+    }
 
     float b[18] = {
             -0.66359285f-0.13f, 0.596398637f, 0.149558031f,  // accel bias
@@ -37,7 +37,7 @@ void imuLoop(unsigned long time)
     static unsigned long next;
 
     // is it this time to ping?
-    if (next < time) 
+    if (next < time)
     {
         // set up next ping time
         next = time + IMU_INTERVAL;

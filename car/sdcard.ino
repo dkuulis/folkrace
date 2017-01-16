@@ -8,7 +8,7 @@
 
 void sdCardSetup()
 {
-    if (!SD.begin(SDCARD_CS)) 
+    if (!SD.begin(SDCARD_CS))
     {
         setupFail("Card failed, or not present");
     }
