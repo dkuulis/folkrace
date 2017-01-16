@@ -61,7 +61,7 @@ void loop()
 
         if (nDevices == 0)
         {
-            Serial.println(F("No I2C devices found on bus "));
+            Serial.print(F("No I2C devices found on bus "));
             Serial.println(bus);
         }
         else
