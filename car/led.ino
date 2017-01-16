@@ -12,27 +12,31 @@ void ledSetup()
 }
 
 // blink LEDs in loop, omit some if button is pressed
-void ledLoop(unsigned long time, int buttonState)
+void ledLoop(unsigned long time, int mode)
 {
     static unsigned long next = 0;
     static bool state = false;
+    static int previous = -1;
 
-    if (next < time) // we are past next status transition
+    // reset timimg on mode change
+    if (previous != mode)
+    {
+       next = time;
+       previous = mode;
+       state = false; // will be blinked to true immediately
+    }
+
+    if (next <= time) // we are past next status transition
     {
         next  = time + LED_PULSE;
         state = !state; // change state to blink
 
-        // no blinking on non-blue LEDs if button is pressed
-        int otherState = buttonState ? LOW : state;
-
-        digitalWrite(LED_PIN, otherState);
-        digitalWrite(RED_LED_PIN, otherState);
-        digitalWrite(YELLOW_LED_PIN, otherState);
-        digitalWrite(GREEN_LED_PIN, otherState);
-
-        // blues always blink
-        digitalWrite(LEFT_BLUE_LED_PIN, state);
-        digitalWrite(RIGHT_BLUE_LED_PIN, state);
+        digitalWrite(LED_PIN, state && (mode == MODE_BLINK || mode == MODE_SONAR || mode == MODE_IMU));
+        digitalWrite(RED_LED_PIN, state && (mode == MODE_BLINK));
+        digitalWrite(YELLOW_LED_PIN, state && (mode == MODE_BLINK || mode == MODE_COUNTDOWN));
+        digitalWrite(GREEN_LED_PIN, (state && (mode == MODE_BLINK || mode == MODE_READY)) || mode == MODE_IDLE);
+        digitalWrite(LEFT_BLUE_LED_PIN, (state && mode == MODE_BLINK) || (!state && mode == MODE_RUN));
+        digitalWrite(RIGHT_BLUE_LED_PIN, state && (mode == MODE_BLINK || mode == MODE_RUN));
     }
 }
 

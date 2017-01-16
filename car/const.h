@@ -6,14 +6,41 @@
 #define LEFT_BLUE_LED_PIN 14
 #define RIGHT_BLUE_LED_PIN 2
 
-#define LED_PULSE 200
+#define LED_PULSE 250
 
 // servo PWM pins
 #define DRIVE_PIN 5
 #define STEER_PIN 30
 
+// steering
+#define STEER_ZERO 1500
+#define STEER_MIN 1160 // left
+#define STEER_MAX 1840 // right
+
+#define EEPROM_STEER_ZERO 10
+#define EEPROM_STEER_MIN 12
+#define EEPROM_STEER_MAX 14
+
+// drive
+#define DRIVE_ZERO 1500
+#define DRIVE_FORWARD 1550
+#define DRIVE_BACKWARD 1450
+#define DRIVE_MIN 1400
+#define DRIVE_MAX 1600
+#define DRIVE_STEP 20
+#define DRIVE_INTERVAL 50
+
+#define EEPROM_DRIVE_ZERO 20
+#define EEPROM_DRIVE_MIN 22
+#define EEPROM_DRIVE_MAX 24
+#define EEPROM_DRIVE_INTERVAL 26
+
 // button pin
 #define BUTTON_PIN 8
+
+#define BUTTON_NONE 0
+#define BUTTON_PRESS 1
+#define BUTTON_RELEASE 2
 
 #define DEBOUNCE_DELAY 50 // ms
 
@@ -64,7 +91,30 @@
 #define QY 2
 #define QZ 3
 
-// constants
+// IMU constants
 #define G 9.807f
 #define DEG2RAD (3.14159265359f/180.0f)
 #define RAD2DEG (180.0f/3.14159265359f)
+
+// log levels
+#define LOG_INFO 0
+#define LOG_WARNING 1
+#define LOG_ERROR 2
+
+// modes
+#define MODE_IDLE 0 // do nothing
+#define MODE_BLINK 1 // blink LEDs
+#define MODE_READY 2 // enter countdown on button-press
+#define MODE_COUNTDOWN 3 // 5s countdown to run
+#define MODE_RUN 4 // run
+#define MODE_SONAR 5 // circular sonar sweep
+#define MODE_IMU 6 // dump IMU data
+
+#define COUNTDOWN_INTERVAL 5000 // ms = 5s
+#define READY_TIMEOUT 15000 // ms = 15s
+
+// serial buffer size
+#define SERIAL_BUFFER 128
+#define SERIAL_END1 10
+#define SERIAL_END2 13
+

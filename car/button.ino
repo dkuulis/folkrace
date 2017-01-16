@@ -7,7 +7,7 @@ void buttonSetup()
 }
 
 // check for button press
-int buttonPressed(unsigned long time)
+int buttonEvent(unsigned long time)
 {
     static int state = HIGH;
     static int lastButtonState = HIGH;   // the previous reading from the input pin
@@ -15,6 +15,7 @@ int buttonPressed(unsigned long time)
 
     // read the state of the switch into a local variable:
     int reading = digitalRead(BUTTON_PIN);
+    int event = BUTTON_NONE;
 
     // check to see if you just pressed the button
     // (i.e. the input went from LOW to HIGH),  and you've waited
@@ -30,14 +31,14 @@ int buttonPressed(unsigned long time)
         lastButtonState = reading;
     }
 
-    if ((time - lastDebounceTime) > DEBOUNCE_DELAY)
+    if ((time - lastDebounceTime) > DEBOUNCE_DELAY && state != reading)
     {
         // whatever the reading is at, it's been there for longer
         // than the debounce delay, so take it as the actual current state
+        event = reading ? BUTTON_RELEASE : BUTTON_PRESS;
         state = reading;
     }
 
-    // invert as pressed button is LOW, released is HIGH
-    return !state;
+    return event;
 }
 

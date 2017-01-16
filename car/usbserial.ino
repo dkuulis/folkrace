@@ -1,20 +1,20 @@
 #include "const.h"
 
-void btSerialSetup()
+void usbSerialSetup()
 {
-    Serial4.begin(9600); // Default connection rate for my BT module
+    Serial.begin(115200);
 }
 
-char* btSerialLoop(unsigned long time)
+char* usbSerialLoop(unsigned long time)
 {
     static char buffer[SERIAL_BUFFER];
     static int end = 0;
 
-    while (Serial4.available() > 0)
+    while (Serial.available() > 0)
     {
-        char c = Serial4.read();
+        char c = Serial.read();
 
-        if (c == SERIAL_END1 || c == SERIAL_END2 || end == SERIAL_BUFFER - 1)
+        if (c == SERIAL_END1 || c == SERIAL_END2 || end == SERIAL_BUFFER - 1) // TODO - pick right character terminator
         {
             if (end == 0)
             {

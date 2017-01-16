@@ -12,7 +12,7 @@ void imuSetup()
 {
     int status = IMU.begin(ACCEL_RANGE_4G, GYRO_RANGE_500DPS);
 
-    if (!status)
+    if (status != 0)
     {
         setupFail("IMU initialization unsuccessful");
     }
@@ -32,11 +32,11 @@ void imuSetup()
     IMU.setBias(b);
 }
 
-void imuLoop(unsigned long time)
+void imuLoop(unsigned long time, int mode)
 {
     static unsigned long next;
 
-    // is it this time to ping?
+    // is it this time to read IMU
     if (next < time)
     {
         // set up next ping time
@@ -54,11 +54,13 @@ void imuLoop(unsigned long time)
         // function to get North along the accel +x-axis, East along the accel -y-axis, and Down along the accel -z-axis.
         // This orientation choice can be modified to allow any convenient (non-NED) orientation convention.
         // Pass gyro rate as rad/sx
-
         MadgwickQuaternionUpdate(q, d, IMU.delta);
 
         // print the data
-        printData(time);
+        if (mode == MODE_IMU)
+        {
+            printData(time);
+        }
     }
 }
 
