@@ -60,6 +60,7 @@ void echoCheck()
     }
 }
 
+// accessor
 int sonarDistance(int sensor)
 {
     return distance[sensor];

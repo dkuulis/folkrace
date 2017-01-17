@@ -3,15 +3,24 @@
 
 #include "const.h"
 
-Servo drive;
+Servo driveServo;
 
-static int drivePulse = DRIVE_ZERO;
+static int driveZero = DRIVE_ZERO;
+static int driveMin = DRIVE_MIN;
+static int driveMax = DRIVE_MAX;
+static int driveInterval = DRIVE_INTERVAL;
+
+static int drive = DRIVE_ZERO;
 
 void driveSetup()
 {
-    drive.attach(DRIVE_PIN);
+    driveServo.attach(DRIVE_PIN);
     Wire2.begin(); // enable ESC I2C
-    drive.writeMicroseconds(drivePulse);
+    
+    driveEeprom(EEPROM_READ);
+    
+    drive = driveZero;
+    driveServo.writeMicroseconds(drive);
 }
 
 void driveLoop(unsigned long time, int mode)
@@ -20,24 +29,28 @@ void driveLoop(unsigned long time, int mode)
 
     if (next <= time) // we are past next PWM update
     {
-        next  = time + DRIVE_INTERVAL;
+        next  = time + driveInterval;
 
-        int old = drivePulse;
-        drivePulse = getDrivePulse(mode);
+        int old = drive;
+        updateDrive(mode);
 
-        if (old != drivePulse)
+        if (old != drive)
         {
-            datalog("Driving ", drivePulse, LOG_INFO);
-            drive.writeMicroseconds(drivePulse);
+            datalog("Driving ", drive, LOG_INFO);
+            driveServo.writeMicroseconds(drive);
         }
+
+        // do steering 
+        steerLoop();
     }
 }
 
-int getDrivePulse(int mode)
+void updateDrive(int mode)
 {
     if (mode != MODE_RUN)
     {
-        return DRIVE_ZERO;
+        drive = driveZero;
+        return;
     }
 
     int freespace = sonarDistance(0); // space ahead
@@ -45,9 +58,18 @@ int getDrivePulse(int mode)
     {
         datalog("Stopping at ", freespace, LOG_WARNING);
         setIdle();
-        return DRIVE_ZERO;
+
+        drive = driveZero;
+        return;
     }
 
-    return DRIVE_MAX;
+    drive = driveMax;
 }
 
+void driveEeprom(int action)
+{
+    eepromRW(EEPROM_DRIVE_ZERO, DRIVE_ZERO, driveZero, action);
+    eepromRW(EEPROM_DRIVE_MIN, DRIVE_MIN, driveMin, action);
+    eepromRW(EEPROM_DRIVE_MAX, DRIVE_MAX, driveMax, action);
+    eepromRW(EEPROM_DRIVE_INTERVAL, DRIVE_INTERVAL, driveInterval, action);
+}

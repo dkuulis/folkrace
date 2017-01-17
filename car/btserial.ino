@@ -5,6 +5,7 @@ void btSerialSetup()
     Serial4.begin(9600); // Default connection rate for my BT module
 }
 
+// check if full command has been received
 char* btSerialLoop(unsigned long time)
 {
     static char buffer[SERIAL_BUFFER];

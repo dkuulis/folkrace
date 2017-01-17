@@ -6,8 +6,8 @@ void buttonSetup()
     pinMode(BUTTON_PIN, INPUT_PULLUP);
 }
 
-// check for button press
-int buttonEvent(unsigned long time)
+// check for button press/release
+int buttonLoop(unsigned long time)
 {
     static int state = HIGH;
     static int lastButtonState = HIGH;   // the previous reading from the input pin

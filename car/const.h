@@ -101,6 +101,8 @@
 #define LOG_WARNING 1
 #define LOG_ERROR 2
 
+#define EEPROM_LOG_ID 0
+
 // modes
 #define MODE_IDLE 0 // do nothing
 #define MODE_BLINK 1 // blink LEDs
@@ -117,4 +119,10 @@
 #define SERIAL_BUFFER 128
 #define SERIAL_END1 10
 #define SERIAL_END2 13
+
+// eeprom actions
+#define EEPROM_READ 0
+#define EEPROM_WRITE 1
+#define EEPROM_RESET 2
+#define EEPROM_SHOW 3
 

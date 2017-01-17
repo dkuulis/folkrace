@@ -2,11 +2,38 @@
 
 #include "const.h"
 
-Servo steer;
-static int steerPulse = STEER_ZERO;
+Servo steerServo;
+
+static int steerZero = STEER_ZERO;
+static int steerMin = STEER_MIN;
+static int steerMax = STEER_MAX;
+
+static int steer = STEER_ZERO;
 
 void steerSetup()
 {
-    steer.attach(STEER_PIN);
-    steer.writeMicroseconds(steerPulse);
+    steerServo.attach(STEER_PIN);
+    
+    steerEeprom(EEPROM_READ);
+
+    steer = steerZero;
+    steerServo.writeMicroseconds(steer);
+}
+
+// invoked from drive loop
+void steerLoop()
+{
+    if (steer != steerZero) // TODO - temp code
+    {
+        steer = steerZero;
+        datalog("Steering ", steer, LOG_INFO);
+        steerServo.writeMicroseconds(steer);
+    }
+}
+
+void steerEeprom(int action)
+{
+    eepromRW(EEPROM_STEER_ZERO, STEER_ZERO, steerZero, action);
+    eepromRW(EEPROM_STEER_MIN, STEER_MIN, steerMin, action);
+    eepromRW(EEPROM_STEER_MAX, STEER_MAX, steerMax, action);
 }
