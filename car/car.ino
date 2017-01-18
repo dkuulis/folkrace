@@ -8,8 +8,9 @@ void setup()
     ledSetup();
     usbSerialSetup();
     btSerialSetup();
-    sdCardSetup();
     eepromSetup();
+    sdCardSetup();
+    lcdSetup();
 
     buttonSetup();
     steerSetup();
@@ -30,13 +31,16 @@ void loop()
     command = command ? command : btSerialLoop(time); // if no USB serial commnad, try bluetooth
     int buttonEvent= buttonLoop(time);
 
-    // udpate modes and execute commands
+    // update modes and execute commands
     mode = processCommand(time, command, mode);
     mode = processButtonEvent(time, buttonEvent, mode);
     mode = processMode(time, mode);
 
-    // component actions
+    // display actions
     ledLoop(time, mode);
+    lcdLoop(time, mode);
+
+    // sensor actions
     sonarLoop(time, mode);
     imuLoop(time, mode);
 

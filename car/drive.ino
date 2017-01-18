@@ -15,7 +15,7 @@ static int drive = DRIVE_ZERO;
 void driveSetup()
 {
     driveServo.attach(DRIVE_PIN);
-    Wire2.begin(); // enable ESC I2C
+    Wire2.begin(I2C_MASTER, 0,  I2C_PINS_3_4, I2C_PULLUP_EXT, 100000);  // enable ESC I2C
     
     driveEeprom(EEPROM_READ);
     

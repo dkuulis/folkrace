@@ -12,7 +12,7 @@ void eepromRW(int address, int defaultValue, int &var, int action)
     {
         short v;
         EEPROM.get(address, v);
-        if (v) 
+        if (v != -1) 
         {
             var = v;
         }
@@ -25,6 +25,8 @@ void eepromRW(int address, int defaultValue, int &var, int action)
 
     if (action == EEPROM_WRITE)
     {
+        datalog("EEPROM write ", address, var, LOG_WARNING);
+        
         short v = var;
         EEPROM.update(address, v & 0xFF);
         EEPROM.update(address+1, (v >> 8 ) & 0xFF);        
@@ -56,6 +58,6 @@ void eepromSet(const char* p)
     
     sscanf(p, "%i %i", &address, &value); 
 
-    datalog("Set EEPROM", address, value, LOG_WARNING);
+    datalog("Set EEPROM ", address, value, LOG_WARNING);
     eepromRW(address, 0, value, EEPROM_WRITE);
 }
