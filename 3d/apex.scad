@@ -195,10 +195,10 @@ module platform() {
         }
 
         // board mount holes
-        translate ([-(45-2.5)-10,  (35-2.5), 2.5]) screw2x6bore();
-        translate ([-(45-2.5)-10, -(35-2.5), 2.5]) screw2x6bore();
-        translate ([ (45-2.5)-10,  (35-2.5), 2.5]) screw2x6bore();
-        translate ([ (45-2.5)-10, -(35-2.5), 2.5]) screw2x6bore();
+        #translate ([-(45-2.5)-10,  (35-2.5), 2.5]) screw2x6bore();
+        #translate ([-(45-2.5)-10, -(35-2.5), 2.5]) screw2x6bore();
+        #translate ([ (45-2.5)-10,  (35-2.5), 2.5]) screw2x6bore();
+        #translate ([ (45-2.5)-10, -(35-2.5), 2.5]) screw2x6bore();
 
         // mount holes
         // front
@@ -218,7 +218,7 @@ module platform() {
         #translate ([-81,-46.5/2+3/2, 12-2-3/2]) rotate([90, 0, 90]) cylinder(d=3, h=20, center=true);
         #translate ([-81, 46.5/2-3/2, 12-2-3/2-6]) rotate([90, 0, 90]) cylinder(d=3, h=12, center=true);
     }
-    arrangebottom(30)
+    #arrangebottom(30)
     {
         hbaseholes(center=true, right=1, left=1);
         hbaseholes(center=true, right=0, left=1);
@@ -226,6 +226,9 @@ module platform() {
         hbaseholes(center=true, right=1, left=0);
         hbaseholes(center=true, right=1, left=0);
     }
+    // cage holes
+    #cage(cut=true);
+
     //arrangebottom(45) hbaseholes();
     }
 }
@@ -356,57 +359,224 @@ module hsonar() {
     //color("white") translate ([20+1000/2, 0, 10]) rotate([0, 90, 0]) cylinder(d1=40, d2=520,h=1000, center=true);
 }
 
-/*skew takes an array of six koef:
- *x along y
- *x along z
- *y along x
- *y along z
- *z along x
- *z along y
- */
+module barbox(p1, p2, s=1, r=1) {
+    
+    a = [p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]];
+    l = norm(a);
+    b = [a[0]/l, a[1]/l, a[2]/l];
+    
+    c = cross([0,0,1], b);
+    
+    az = atan2(c[0], c[1]);
+    ax = acos(b[2]);
+    
+    o = s/2-r;
+    s1 = s-2*r;
+   
+    translate(p1) 
+        rotate([0, 0, -az])   
+           rotate([0, ax, 0])
+               translate([0, 0, l/2]) {
+                    cube(size=[s1, s, l], center=true);
+                    cube(size=[s, s1, l], center=true);
 
-module skew(dims) {
+                    for (x=[o, -o])                   
+                        for (y=[o, -o]) {
+                            translate([x,y,0]) cylinder(r=r, h=l, center=true);
+                            for (z=[l/2, -l/2]) {
+                                translate([x,y,z]) sphere(r=r, center=true);
+                            }
+                        }
+
+                    for (z=[l/2, -l/2]) {
+                        translate([0,0,z]) cube(size=[s1, s1, 2*r], center=true);                
+
+                        translate([ 0, o, z]) rotate([0,90,0]) cylinder(r=r, h=s1, center=true);
+                        translate([ 0,-o, z]) rotate([0,90,0]) cylinder(r=r, h=s1, center=true);
+                        translate([ o, 0, z]) rotate([90,0,0]) cylinder(r=r, h=s1, center=true);
+                        translate([-o, 0, z]) rotate([90,0,0]) cylinder(r=r, h=s1, center=true);
+                    }
+                    
+               }
+}
+
+module bar(p1, p2, s=1) {
+    
+    a = [p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]];
+    l = norm(a);
+    b = [a[0]/l, a[1]/l, a[2]/l];
+    
+    c = cross([0,0,1], b);
+    
+    az = atan2(c[0], c[1]);
+    ax = acos(b[2]);
+    
+    translate(p1) sphere(d=s, center=true);
+    translate(p2) sphere(d=s, center=true);
+   
+    translate(p1) 
+        rotate([0, 0, -az])   
+           rotate([0, ax, 0])
+               cylinder(d=s, h=l, center=false);
+}
+
+module ball8(p1, s=1, r=1) {
+
+    o = s/2-r;
+   
+    translate(p1) 
+        for (x=[o, -o])                   
+            for (y=[o, -o])
+                for (z=[o, -o]) 
+                    translate([x,y,z])
+                        sphere(r=r, center=true);
+}
+
+module skew(p1, p2) { // TODO - not working
+
+    a = [p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2]];
+    b = [a[0]/a[2], a[1]/a[2]];
+    
     matrix = [
-	    [ 1, dims[0], dims[1], 0 ],
-	    [ dims[2], 1, dims[4], 0 ],
-	    [ dims[5], dims[3], 1, 0 ],
-	    [ 0, 0, 0, 1 ]
+        [ 1, 0, b[1], 0 ],
+        [ 0, 1, b[2], 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ]
     ];
 
-    multmatrix(matrix) children();
+    translate(p1) 
+        multmatrix(matrix) 
+                children();
 }
 
-module cagetop()
+module cage_leg(p1, p2, d, db, r)
 {
-            for (x = [-20, 0, 20, 40]) translate([x-10, 0, 81]) cube(size=[2, 60, 2], center=true);
-            for (y = [-30, 0, 30])    translate([0, y, 81])  cube(size=[60, 2, 2], center=true);
-
-            translate([43, 0, 67]) skew([0, -0.9, 0, 0, 0, 0]) cube(size=[2, 2, 30], center=true);
-
-            // front sides
-            translate([33, -33, 67]) skew([0, -0.2, 0, 0, 0.2, 0]) cube(size=[2, 2, 30], center=true);
-            translate([33,  33, 67]) skew([0, -0.2, 0, 0, -0.2, 0]) cube(size=[2, 2, 30], center=true);
-
-            // rear
-            translate([-42, -34.5, 67]) skew([0, 0.8, 0, 0, 0.3, 0]) cube(size=[2, 2, 30], center=true);
-            translate([-42,  34.5, 67]) skew([0, 0.8, 0, 0, -0.3, 0]) cube(size=[2, 2, 30], center=true);
+//    bar(p1, p2, d);   
+    
+    hull() {
+        ball8(p2, d, r);
+        translate([0, 0, -d/2]) translate(p1) difference() {
+            sphere(d=db, center=true);
+            translate([0, 0, -db/2]) cube(size=[db, db, db], center=true);
+        }
+    }
 }
 
-module cage(round=false)
+module cage_pin(p1, p2, d, pd, ph, cut)
 {
-    if (round) minkowski() {
-        cagetop();
-        sphere(r=1);
-    } else
-        cagetop();
-
-    #translate([ 36,  36, 45]) cylinder(d=3, h=7, center=false);
-    #translate([ 36, -36, 45]) cylinder(d=3, h=7, center=false);
-
-    #translate([-54, -39, 45]) cylinder(d=3, h=7, center=false);
-    #translate([-54,  39, 45]) cylinder(d=3, h=7, center=false);
+    if (cut)
+    {
+        bar(p1, p2, d+0.5);   
+    }
+    else
+    difference() {
+        bar(p1, p2, d);   
+        
+        translate ([0,0,-ph])
+            translate (p1) 
+                rotate([90,0,0])
+                    cylinder(d=pd, h=2*d, center=true);
+    }     
 }
 
+module lcd_mount(p1, x1, x2)
+{
+    translate(p1) difference() {
+        #translate([(x1-x2)/2,0,-1]) cube(size=[x1+x2, 8, 2], center=true);
+        #cylinder(d=2, h=6, center=true);
+    }     
+}
+
+module cage(cut = false)
+{
+    
+    d = 4;
+    r1 = 1;
+    n = 4;
+    db = 6;
+    hb = d;
+    pd = 1;
+    ph = d/2 + 3 /*platform*/+ 1/*freespace*/;
+
+    // measurements    
+    top = 82;
+    
+    top_side = 30;
+    
+    top_front = 20;
+    top_rear = -40;
+
+    top_esc = top_front-26/*esc size*/+d;
+    top_lcd = top_rear+27/*lcd size*/+d+1;
+    
+    bottom = 51/*platform top*/+d/2;
+    
+    bottom_front = 27;
+    bottom_rear = -50;
+
+    bottom_front_side = 40;
+    bottom_rear_side = 40;
+
+    pin = 8;
+    pin_base = bottom - pin;
+
+    // points
+    top_front_left = [top_front, top_side, top];
+    top_front_right = [top_front, -top_side, top];
+
+    top_esc_left = [top_esc, top_side, top];
+    top_esc_right = [top_esc, -top_side, top];
+
+    top_lcd_left = [top_lcd, top_side, top];
+    top_lcd_right = [top_lcd, -top_side, top];
+
+    top_rear_left = [top_rear, top_side, top];
+    top_rear_right = [top_rear, -top_side, top];
+
+    //mid_front_left = [(top_front+bottom_front)/2, (top_side+bottom_front_side)/2, (top+bottom)/2];
+    //mid_front_right = [mid_front_left[0], -mid_front_left[1], mid_front_left[2]];
+
+    bottom_front_left = [bottom_front, bottom_front_side, bottom];
+    bottom_front_right = [bottom_front, -bottom_front_side, bottom];
+
+    bottom_rear_left = [bottom_rear, bottom_rear_side, bottom];
+    bottom_rear_right = [bottom_rear, -bottom_rear_side, bottom];
+
+    pin_front_left = [bottom_front, bottom_front_side, pin_base];
+    pin_front_right = [bottom_front, -bottom_front_side, pin_base];
+
+    pin_rear_left = [bottom_rear, bottom_rear_side, pin_base];
+    pin_rear_right = [bottom_rear, -bottom_rear_side, pin_base];
+     
+    // bars
+    if (!cut)
+    {
+        barbox(top_front_left, top_front_right, d, r1);   
+        barbox(top_rear_left, top_rear_right, d, r1);   
+        barbox(top_front_left, top_rear_left, d, r1);   
+        barbox(top_front_right, top_rear_right, d, r1);   
+
+        barbox(top_esc_left, top_esc_right, d, r1);   
+        barbox(top_lcd_left, top_lcd_right, d, r1);
+        
+        lcd_mount([top_rear+d/2+2.5+23+0.5,  23/2, top+d/2], 4, 3);
+        lcd_mount([top_rear+d/2+2.5+23+0.5, -23/2, top+d/2], 4, 3);
+        lcd_mount([top_rear+d/2+2.5+0.5,     23/2, top+d/2], 3, 4);
+        lcd_mount([top_rear+d/2+2.5+0.5,    -23/2, top+d/2], 3, 4);
+
+        //bar(mid_front_left, mid_front_right, d);  // unprintable
+
+        cage_leg(bottom_front_left, top_front_left, d, db, r1);
+        cage_leg(bottom_front_right, top_front_right, d, db, r1);
+        cage_leg(bottom_rear_left, top_rear_left, d, db, r1);
+        cage_leg(bottom_rear_right, top_rear_right, d, db, r1);
+    }
+    
+    cage_pin(bottom_front_left, pin_front_left, d, pd, ph, cut);   
+    cage_pin(bottom_front_right, pin_front_right, d, pd, ph, cut);   
+    cage_pin(bottom_rear_left, pin_rear_left, d, pd, ph, cut);   
+    cage_pin(bottom_rear_right, pin_rear_right, d, pd, ph, cut);   
+}
 
 module car()
 {
@@ -415,7 +585,7 @@ module car()
     board();
     color("white") cage();
 
-    translate ([30, -5, 60]) rotate([90, 0, 90]) esc();
+    translate ([9, -8, 79]) rotate([0, 0, 90]) esc();
 }
 
 module arrangebottom(a) {
@@ -432,18 +602,24 @@ module lcd1602() {
 translate([-15,0,78]) difference() {
     union() {
         translate([0,0,5+8/2]) color("blue") cube(size=[27, 72, 8], center=true);
-        #translate([0,0,4+1/2]) color("green") cube(size=[36, 80, 1], center=true);
+        translate([0,0,4+1/2]) color("green") cube(size=[36, 80, 1], center=true);
     }
-    #translate([ 31/2, 75/2,0]) cylinder(d=2.5, h=20, center=false);
-    #translate([-31/2, 75/2,0]) cylinder(d=2.5, h=20, center=false);
-    #translate([ 31/2,-75/2,0]) cylinder(d=2.5, h=20, center=false);
-    #translate([-31/2,-75/2,0]) cylinder(d=2.5, h=20, center=false);
+    translate([ 31/2, 75/2,0]) cylinder(d=2.5, h=20, center=false);
+    translate([-31/2, 75/2,0]) cylinder(d=2.5, h=20, center=false);
+    translate([ 31/2,-75/2,0]) cylinder(d=2.5, h=20, center=false);
+    translate([-31/2,-75/2,0]) cylinder(d=2.5, h=20, center=false);
 }
+}
+
+module lcd() {
+    color("blue") translate([-40+2+27.5/2+0.5,0,81]) cube(size=[27.5, 27.5, 2], center=true);
 }
 
 module fullb() {
     car();
     arrangebottom(30) hsonar();
+    cage();
+    lcd();
 }
 
 //car();
@@ -454,7 +630,10 @@ module fullb() {
 //board();
 //platform();
 
-fullb();
+//fullb();
+
+
+//barbox([0,0,0], [0,0,50], 10, 3);
 
 //translate ([0, 0, 4.5]) rotate([0, 90, 0]) hmount();
 
@@ -482,5 +661,4 @@ intersection() {
 //rotate([0,0,180]) projection(cut=true) translate ([0, 0, -49]) platform();
 //projection() translate ([0, 0, 10]) hsonar();
 
-//translate([0,0,80]) rotate([180,0,0]) cage(true);
-
+translate([0,0,90]) rotate([180,0,0]) cage();
