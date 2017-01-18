@@ -173,10 +173,9 @@ int processCommand(unsigned long time, char* command, int mode)
         return MODE_IMU;
     }
     else
-    if (strcmp(command, "dump") == 0)
+    if (memcmp(command, "dump", 4) == 0    )
     {
-        datalog("Dumping datalog", LOG_WARNING);
-        dumpFile();
+        dumpFile(command+4);
         datalog("Dump done", LOG_WARNING);
         return mode;
     }

@@ -20,11 +20,11 @@ static File logFile;
 static int log_id = 1;
 static char logname[13]; // 8.3 filename and trailing 0
 
-void formatName()
+void formatName(int nr)
 {
     strcpy(logname, "log");
     int x = strlen(logname);
-    itoa(log_id, logname+x, 10);
+    itoa(nr, logname+x, 10);
     strcat(logname, ".txt");
 }
 
@@ -39,7 +39,7 @@ void findName()
     sdCardEeprom(EEPROM_READ);
     do 
     {
-        formatName();
+        formatName(log_id);
         log_id += 1;
         datalog("Trying logfile ", logname, LOG_WARNING);
     } while (SD.exists(logname));
@@ -89,10 +89,18 @@ void closeLog()
     }
 }
 
-void dumpFile()
+void dumpFile(const char* command)
 {
     closeLog();
 
+    if (command[0] == ' ')
+    {
+        int nr;
+        sscanf(command+1, "%i", &nr);
+        formatName(nr);
+    }
+    
+    datalog("Dumping ", logname, LOG_WARNING);
     // open the file. note that only one file can be open at a time,
     // so you have to close this one before opening another.
     File dataFile = SD.open(logname);
