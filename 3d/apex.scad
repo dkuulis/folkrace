@@ -482,8 +482,8 @@ module cage_pin(p1, p2, d, pd, ph, cut)
 module lcd_mount(p1, x1, x2)
 {
     translate(p1) difference() {
-        #translate([(x1-x2)/2,0,-1]) cube(size=[x1+x2, 8, 2], center=true);
-        #cylinder(d=2, h=6, center=true);
+        #translate([(x1-x2)/2,0,-1]) cube(size=[x1+x2, 6, 2], center=true);
+        #cylinder(d=2.2, h=6, center=true);
     }     
 }
 
@@ -559,10 +559,10 @@ module cage(cut = false)
         barbox(top_esc_left, top_esc_right, d, r1);   
         barbox(top_lcd_left, top_lcd_right, d, r1);
         
-        lcd_mount([top_rear+d/2+2.5+23+0.5,  23/2, top+d/2], 4, 3);
-        lcd_mount([top_rear+d/2+2.5+23+0.5, -23/2, top+d/2], 4, 3);
-        lcd_mount([top_rear+d/2+2.5+0.5,     23/2, top+d/2], 3, 4);
-        lcd_mount([top_rear+d/2+2.5+0.5,    -23/2, top+d/2], 3, 4);
+        lcd_mount([top_rear+d/2+2.5+23+0.5,  23.5/2, top+d/2], 4, 2);
+        lcd_mount([top_rear+d/2+2.5+23+0.5, -23.5/2, top+d/2], 4, 2);
+        lcd_mount([top_rear+d/2+2.5-0.5,     23.5/2, top+d/2], 2, 4);
+        lcd_mount([top_rear+d/2+2.5-0.5,    -23.5/2, top+d/2], 2, 4);
 
         //bar(mid_front_left, mid_front_right, d);  // unprintable
 
