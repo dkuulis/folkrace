@@ -60,4 +60,6 @@ void eepromSet(const char* p)
 
     datalog("Set EEPROM ", address, value, LOG_WARNING);
     eepromRW(address, 0, value, EEPROM_WRITE);
+    
+    eepromAction(EEPROM_READ);
 }

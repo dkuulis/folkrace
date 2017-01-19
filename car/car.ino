@@ -29,7 +29,7 @@ void loop()
     char* command;
     command = usbSerialLoop(time);
     command = command ? command : btSerialLoop(time); // if no USB serial commnad, try bluetooth
-    int buttonEvent= buttonLoop(time);
+    int buttonEvent = buttonLoop(time);
 
     // update modes and execute commands
     mode = processCommand(time, command, mode);
