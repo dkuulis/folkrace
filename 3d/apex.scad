@@ -227,7 +227,7 @@ module platform() {
         hbaseholes(center=true, right=1, left=0);
     }
     // cage holes
-    #cage(cut=true);
+    #cage(mode=1/*cut*/);
 
     //arrangebottom(45) hbaseholes();
     }
@@ -365,6 +365,8 @@ module barbox(p1, p2, s=1, r=1) {
     l = norm(a);
     b = [a[0]/l, a[1]/l, a[2]/l];
     
+    l1 = l+s-2*r;
+    
     c = cross([0,0,1], b);
     
     az = atan2(c[0], c[1]);
@@ -377,18 +379,18 @@ module barbox(p1, p2, s=1, r=1) {
         rotate([0, 0, -az])   
            rotate([0, ax, 0])
                translate([0, 0, l/2]) {
-                    cube(size=[s1, s, l], center=true);
-                    cube(size=[s, s1, l], center=true);
+                    cube(size=[s1, s, l1], center=true);
+                    cube(size=[s, s1, l1], center=true);
 
                     for (x=[o, -o])                   
                         for (y=[o, -o]) {
-                            translate([x,y,0]) cylinder(r=r, h=l, center=true);
-                            for (z=[l/2, -l/2]) {
+                            translate([x,y,0]) cylinder(r=r, h=l1, center=true);
+                            for (z=[l1/2, -l1/2]) {
                                 translate([x,y,z]) sphere(r=r, center=true);
                             }
                         }
 
-                    for (z=[l/2, -l/2]) {
+                    for (z=[l1/2, -l1/2]) {
                         translate([0,0,z]) cube(size=[s1, s1, 2*r], center=true);                
 
                         translate([ 0, o, z]) rotate([0,90,0]) cylinder(r=r, h=s1, center=true);
@@ -449,32 +451,37 @@ module skew(p1, p2) { // TODO - not working
                 children();
 }
 
-module cage_leg(p1, p2, d, db, r)
+module cage_leg(p1, p2, d, db, r, mode)
 {
-//    bar(p1, p2, d);   
-    
-    hull() {
-        ball8(p2, d, r);
-        translate([0, 0, -d/2]) translate(p1) difference() {
-            sphere(d=db, center=true);
-            translate([0, 0, -db/2]) cube(size=[db, db, db], center=true);
+    if (mode == 2) {
+        bar(p1, p2, d);   
+    }
+    else {        
+        hull() {
+            ball8(p2, d, r);
+            translate([0, 0, -d/2]) translate(p1) difference() {
+                sphere(d=db, center=true);
+                translate([0, 0, -db/2]) cube(size=[db, db, db], center=true);
+            }
         }
     }
 }
 
-module cage_pin(p1, p2, d, pd, ph, cut)
+module cage_pin(p1, p2, d, pd, ph, mode)
 {
-    if (cut)
+    extra = mode == 1 /*cut*/ ? 0.5 : 0;
+
+    if (mode == 1)
     {
-        bar(p1, p2, d+0.5);   
+        bar(p1, p2, d+extra);   
     }
     else
     difference() {
-        bar(p1, p2, d);   
+        bar(p1, p2, d+extra);   
         
-        translate ([0,0,-ph])
+        #translate ([0,0,-ph])
             translate (p1) 
-                rotate([90,0,0])
+                rotate([0,90,0])
                     cylinder(d=pd, h=2*d, center=true);
     }     
 }
@@ -482,13 +489,14 @@ module cage_pin(p1, p2, d, pd, ph, cut)
 module lcd_mount(p1, x1, x2)
 {
     translate(p1) difference() {
-        #translate([(x1-x2)/2,0,-1]) cube(size=[x1+x2, 6, 2], center=true);
-        #cylinder(d=2.2, h=6, center=true);
+        #translate([(x1-x2)/2,0,-1-0.5/2]) cube(size=[x1+x2, 6, 2.5], center=true);
+        #translate([0,0,-0.5]) screw2x6bore();        
     }     
 }
 
-module cage(cut = false)
+module cage(mode = 0)
 {
+    // mode 0 - full, mode 1 - cutout for platform, 2 - simple full
     
     d = 4;
     r1 = 1;
@@ -506,7 +514,7 @@ module cage(cut = false)
     top_front = 20;
     top_rear = -40;
 
-    top_esc = top_front-26/*esc size*/+d;
+    top_esc = top_front+26/*esc size*/;
     top_lcd = top_rear+27/*lcd size*/+d+1;
     
     bottom = 51/*platform top*/+d/2;
@@ -519,6 +527,10 @@ module cage(cut = false)
 
     pin = 8;
     pin_base = bottom - pin;
+    
+    mid = (top+bottom)/2;
+    mid_side = 15;
+    mid_front = top_esc+10;    
 
     // points
     top_front_left = [top_front, top_side, top];
@@ -533,9 +545,9 @@ module cage(cut = false)
     top_rear_left = [top_rear, top_side, top];
     top_rear_right = [top_rear, -top_side, top];
 
-    //mid_front_left = [(top_front+bottom_front)/2, (top_side+bottom_front_side)/2, (top+bottom)/2];
-    //mid_front_right = [mid_front_left[0], -mid_front_left[1], mid_front_left[2]];
-
+    mid_front_left = [mid_front, mid_side, mid];
+    mid_front_right = [mid_front_left[0], -mid_front_left[1], mid_front_left[2]];
+    
     bottom_front_left = [bottom_front, bottom_front_side, bottom];
     bottom_front_right = [bottom_front, -bottom_front_side, bottom];
 
@@ -549,33 +561,38 @@ module cage(cut = false)
     pin_rear_right = [bottom_rear, -bottom_rear_side, pin_base];
      
     // bars
-    if (!cut)
+    if (mode != 1 /*cut*/)
     {
         barbox(top_front_left, top_front_right, d, r1);   
         barbox(top_rear_left, top_rear_right, d, r1);   
-        barbox(top_front_left, top_rear_left, d, r1);   
-        barbox(top_front_right, top_rear_right, d, r1);   
+        barbox(top_esc_left, top_rear_left, d, r1);   
+        barbox(top_esc_right, top_rear_right, d, r1);   
 
         barbox(top_esc_left, top_esc_right, d, r1);   
         barbox(top_lcd_left, top_lcd_right, d, r1);
+
+        bar(mid_front_left, top_esc_left, d);
+        bar(mid_front_right, top_esc_right, d);
         
         lcd_mount([top_rear+d/2+2.5+23+0.5,  23.5/2, top+d/2], 4, 2);
         lcd_mount([top_rear+d/2+2.5+23+0.5, -23.5/2, top+d/2], 4, 2);
         lcd_mount([top_rear+d/2+2.5-0.5,     23.5/2, top+d/2], 2, 4);
         lcd_mount([top_rear+d/2+2.5-0.5,    -23.5/2, top+d/2], 2, 4);
 
-        //bar(mid_front_left, mid_front_right, d);  // unprintable
-
-        cage_leg(bottom_front_left, top_front_left, d, db, r1);
-        cage_leg(bottom_front_right, top_front_right, d, db, r1);
-        cage_leg(bottom_rear_left, top_rear_left, d, db, r1);
-        cage_leg(bottom_rear_right, top_rear_right, d, db, r1);
+        cage_leg(bottom_front_left, top_front_left, d, db, r1, mode);
+        cage_leg(bottom_front_right, top_front_right, d, db, r1, mode);
+        cage_leg(bottom_rear_left, top_rear_left, d, db, r1, mode);
+        cage_leg(bottom_rear_right, top_rear_right, d, db, r1, mode);
+        
+        // lcd lead protector
+        translate([top_lcd+1,0,top-3]) cube(size=[2, 12, 6], center=true);        
+        translate([top_lcd+1,0,top-5]) cube(size=[2, 16, 2], center=true);        
     }
     
-    cage_pin(bottom_front_left, pin_front_left, d, pd, ph, cut);   
-    cage_pin(bottom_front_right, pin_front_right, d, pd, ph, cut);   
-    cage_pin(bottom_rear_left, pin_rear_left, d, pd, ph, cut);   
-    cage_pin(bottom_rear_right, pin_rear_right, d, pd, ph, cut);   
+    cage_pin(bottom_front_left, pin_front_left, d, pd, ph, mode);   
+    cage_pin(bottom_front_right, pin_front_right, d, pd, ph, mode);   
+    cage_pin(bottom_rear_left, pin_rear_left, d, pd, ph, mode);   
+    cage_pin(bottom_rear_right, pin_rear_right, d, pd, ph, mode);   
 }
 
 module car()
@@ -583,9 +600,9 @@ module car()
     base();
     platform();
     board();
-    color("white") cage();
-
-    translate ([9, -8, 79]) rotate([0, 0, 90]) esc();
+    color("white") cage(mode=2/*simple*/);
+    translate ([33, -8, 79]) rotate([0, 0, 90]) esc();
+    lcd();
 }
 
 module arrangebottom(a) {
@@ -598,28 +615,14 @@ module arrangebottom(a) {
     translate ([-5, -45, 57]) rotate([0, 0, -2*a]) if ($children == 1) children(); else children(4);
 }
 
-module lcd1602() {
-translate([-15,0,78]) difference() {
-    union() {
-        translate([0,0,5+8/2]) color("blue") cube(size=[27, 72, 8], center=true);
-        translate([0,0,4+1/2]) color("green") cube(size=[36, 80, 1], center=true);
-    }
-    translate([ 31/2, 75/2,0]) cylinder(d=2.5, h=20, center=false);
-    translate([-31/2, 75/2,0]) cylinder(d=2.5, h=20, center=false);
-    translate([ 31/2,-75/2,0]) cylinder(d=2.5, h=20, center=false);
-    translate([-31/2,-75/2,0]) cylinder(d=2.5, h=20, center=false);
-}
-}
-
 module lcd() {
     color("blue") translate([-40+2+27.5/2+0.5,0,81]) cube(size=[27.5, 27.5, 2], center=true);
 }
 
-module fullb() {
+module full() {
     car();
     arrangebottom(30) hsonar();
-    cage();
-    lcd();
+
 }
 
 //car();
@@ -630,7 +633,7 @@ module fullb() {
 //board();
 //platform();
 
-//fullb();
+full();
 
 
 //barbox([0,0,0], [0,0,50], 10, 3);
@@ -661,4 +664,4 @@ intersection() {
 //rotate([0,0,180]) projection(cut=true) translate ([0, 0, -49]) platform();
 //projection() translate ([0, 0, 10]) hsonar();
 
-translate([0,0,90]) rotate([180,0,0]) cage();
+//translate([0,0,90]) rotate([180,0,0]) cage();
