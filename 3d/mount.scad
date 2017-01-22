@@ -17,9 +17,8 @@ module mount_holes(center = true, left = 2, right = 2)
 }
 
 // sonar mount bracket
-module mount() {
+module mount(extra = 7) {
 
-    extra = 7;
     top_r = 3;
     bottom_r = 5;
 
@@ -109,4 +108,5 @@ module vertical_sonar() {
     //color("white") translate ([20+1000/2, 0, 22.5]) rotate([0, 90, 0]) cylinder(d1=40, d2=520,h=1000, center=true);
 }
 
-translate ([0, 0, 4.5]) rotate([0, 90, 0]) mount();
+//translate ([0, 0, 4.5]) rotate([0, 90, 0]) mount(); // std version
+translate ([0, 0, 4.5]) rotate([0, 90, 0]) mount(15); // tall
