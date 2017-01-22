@@ -16,7 +16,7 @@ module all()
     board();
     arrange(30) horizontal_sonar();
     color("white") cage(mode=2/*simple*/);
-    translate ([33, -8, 79]) rotate([0, 0, 90]) esc();
+    esc();
     lcd();
 }
 
