@@ -13,7 +13,7 @@ static int steer = STEER_ZERO;
 void steerSetup()
 {
     steerServo.attach(STEER_PIN);
-    
+
     steerEeprom(EEPROM_READ);
 
     steer = steerZero;
@@ -26,7 +26,7 @@ void steerLoop()
     if (steer != steerZero) // TODO - temp code
     {
         steer = steerZero;
-        datalog("Steering ", steer, LOG_INFO);
+        message("Steering %i\n", steer);
         steerServo.writeMicroseconds(steer);
     }
 }

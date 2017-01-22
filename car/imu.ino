@@ -8,6 +8,8 @@ MPU9250 IMU(0x68, 0, I2C_PINS_18_19, I2C_PULLUP_EXT);
 float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};
 float d[10];
 
+static int imuInterval = IMU_INTERVAL;
+
 void imuSetup()
 {
     int status = IMU.begin(ACCEL_RANGE_4G, GYRO_RANGE_500DPS);
@@ -16,6 +18,8 @@ void imuSetup()
     {
         setupFail("IMU initialization unsuccessful");
     }
+
+    imuEeprom(EEPROM_READ);
 
     float b[18] = {
             -0.66359285f-0.13f, 0.596398637f, 0.149558031f,  // accel bias
@@ -32,6 +36,11 @@ void imuSetup()
     IMU.setBias(b);
 }
 
+void imuEeprom(int action)
+{
+    eepromRW(EEPROM_IMU_INTERVAL, IMU_INTERVAL, imuInterval, action);
+}
+
 void imuLoop(unsigned long time, int mode)
 {
     static unsigned long next;
@@ -40,7 +49,7 @@ void imuLoop(unsigned long time, int mode)
     if (next < time)
     {
         // set up next ping time
-        next = time + IMU_INTERVAL;
+        next = time + imuInterval;
 
         // get the accel (m/s/s), gyro (rad/s), and magnetometer (uT), and temperature (C) data
         IMU.getMotion10Unbiased(d);
@@ -57,7 +66,7 @@ void imuLoop(unsigned long time, int mode)
         MadgwickQuaternionUpdate(q, d, IMU.delta);
 
         // print the data
-        if (mode == MODE_IMU)
+        if (mode == MODE_IMU || mode == MODE_RUN || mode == MODE_COUNTDOWN || mode == MODE_RUNOFF)
         {
             printData(time);
         }
@@ -66,39 +75,18 @@ void imuLoop(unsigned long time, int mode)
 
 void printData(unsigned long time)
 {
-    Serial.print(F("IMU "));
-    Serial.print(time);
-
-    Serial.print(F(" ")); Serial.print(d[0], 6);
-    Serial.print(F(" ")); Serial.print(d[1], 6);
-    Serial.print(F(" ")); Serial.print(d[2], 6);
-
-    Serial.print(F(" ")); Serial.print(d[3], 6);
-    Serial.print(F(" ")); Serial.print(d[4], 6);
-    Serial.print(F(" ")); Serial.print(d[5], 6);
-
-    Serial.print(F(" ")); Serial.print(d[6], 6);
-    Serial.print(F(" ")); Serial.print(d[7], 6);
-    Serial.print(F(" ")); Serial.print(d[8], 6);
-
-    Serial.print(F(" ")); Serial.print(q[0], 6);
-    Serial.print(F(" ")); Serial.print(q[1], 6);
-    Serial.print(F(" ")); Serial.print(q[2], 6);
-    Serial.print(F(" ")); Serial.print(q[3], 6);
-
     float roll;
     float pitch;
     float yaw;
 
     toEulerianAngle(q, roll, pitch, yaw);
 
-    Serial.print(F(" ")); Serial.print(roll, 6);
-    Serial.print(F(" ")); Serial.print(pitch, 6);
-    Serial.print(F(" ")); Serial.print(yaw, 6);
-
-    /*
-    Serial.print(F(" ")); Serial.print(d[TEMPERATURE],6); // t
-    */
-
-    Serial.println();
+    info("IMU %lu a %f %f %f g %f %f %f m %f %f %f q %f %f %f %f roll %f pitch %f yaw %f d %f\n",
+        time,
+        d[0], d[1], d[2], // accel
+        d[3], d[4], d[5], // gyro
+        d[6], d[7], d[8], // magnetometer
+        q[0], q[1], q[2], q[3], // quaternion
+        roll, pitch, yaw,
+        IMU.delta);
 }

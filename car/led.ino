@@ -35,8 +35,8 @@ void ledLoop(unsigned long time, int mode)
         digitalWrite(RED_LED_PIN, state && (mode == MODE_BLINK));
         digitalWrite(YELLOW_LED_PIN, state && (mode == MODE_BLINK || mode == MODE_COUNTDOWN));
         digitalWrite(GREEN_LED_PIN, (state && (mode == MODE_BLINK || mode == MODE_READY)) || mode == MODE_IDLE);
-        digitalWrite(LEFT_BLUE_LED_PIN, (state && mode == MODE_BLINK) || (!state && mode == MODE_RUN));
-        digitalWrite(RIGHT_BLUE_LED_PIN, state && (mode == MODE_BLINK || mode == MODE_RUN));
+        digitalWrite(LEFT_BLUE_LED_PIN, (state && mode == MODE_BLINK) || (!state && mode == MODE_RUN) || (mode == MODE_RUNOFF));
+        digitalWrite(RIGHT_BLUE_LED_PIN, state && (mode == MODE_BLINK || mode == MODE_RUN) || (mode == MODE_RUNOFF));
     }
 }
 

@@ -22,18 +22,23 @@
 #define EEPROM_STEER_MAX 14
 
 // drive
-#define DRIVE_ZERO 1500
-#define DRIVE_FORWARD 1550
-#define DRIVE_BACKWARD 1450
-#define DRIVE_MIN 1400
-#define DRIVE_MAX 1600
-#define DRIVE_STEP 20
+#define DRIVE_ZERO 1455 // was 1500
+#define DRIVE_MIN 1390
+#define DRIVE_MAX 1520
 #define DRIVE_INTERVAL 50
+#define SPEED_INTERVAL 1000
+#define DRIVE_SLOW_FORWARD 1507
+#define DRIVE_SLOW_BACKWARD 1404
+#define DRIVE_RANGE 60
 
 #define EEPROM_DRIVE_ZERO 20
 #define EEPROM_DRIVE_MIN 22
 #define EEPROM_DRIVE_MAX 24
 #define EEPROM_DRIVE_INTERVAL 26
+#define EEPROM_SPEED_INTERVAL 28
+#define EEPROM_DRIVE_SLOW_FORWARD 30
+#define EEPROM_DRIVE_SLOW_BACKWARD 32
+#define EEPROM_DRIVE_RANGE 34
 
 // button pin
 #define BUTTON_PIN 8
@@ -56,9 +61,11 @@
 #define SONAR5_TRIG_PIN 9
 #define SONAR5_ECHO_PIN 10
 
-#define SONAR_NUM 5 // Number or sensors
+#define SONAR_NUM 1 // 5 // Number or sensors
 #define MAX_DISTANCE 200 // Maximum distance (in cm) to ping
 #define PING_INTERVAL 33 // Milliseconds between sensor pings (29ms is about the min to avoid cross-sensor echo)
+
+#define EEPROM_PING_INTERVAL 40
 
 // ESC I2C - bus 2 - pins 3/4
 
@@ -69,6 +76,9 @@
 // MPU-9250 IMU I2C - bus 0 - pins 18/19
 #define IMU_INT_PIN 22
 #define IMU_INTERVAL 50 // ms
+
+#define EEPROM_IMU_INTERVAL 50
+
 
 // IMU data indices
 #define AX 0
@@ -109,11 +119,13 @@
 #define MODE_READY 2 // enter countdown on button-press
 #define MODE_COUNTDOWN 3 // 5s countdown to run
 #define MODE_RUN 4 // run
-#define MODE_SONAR 5 // circular sonar sweep
-#define MODE_IMU 6 // dump IMU data
+#define MODE_RUNOFF 5 // post-run breaking for log data gather
+#define MODE_SONAR 6 // circular sonar sweep
+#define MODE_IMU 7 // dump IMU data
 
 #define COUNTDOWN_INTERVAL 5000 // ms = 5s
 #define READY_TIMEOUT 15000 // ms = 15s
+#define RUNOFF_INTERVAL 2000 // ms = 2s
 
 // serial buffer size
 #define SERIAL_BUFFER 128

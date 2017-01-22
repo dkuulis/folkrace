@@ -6,72 +6,35 @@ void setupFail(const char *msg)
     // log message, not on SD as it might not be initialised
     Serial.println(msg);
     Serial4.println(msg);
-    
+
     // just blink red
     ledsOff();
     blinkRedForever();
 }
 
-void datalog(const char* msg, int level)
+// log but not to BT
+void info(const char * format, ...)
 {
-    sdCardPrintln(msg);
-    Serial.println(msg);
+    char buffer[256];
+    va_list args;
+    va_start(args, format);
+    vsprintf(buffer,format, args);
+    va_end(args);
 
-    if (level > LOG_INFO)
-    {
-        Serial4.println(msg);
-    }
+    sdCardPrint(buffer);
+    Serial.print(buffer);
 }
 
-
-void datalog(const char* msg1, const char* msg2, int level)
+// log everywhere
+void message(const char * format, ...)
 {
-    sdCardPrint(msg1);
-    sdCardPrintln(msg2);
+    char buffer[256];
+    va_list args;
+    va_start(args, format);
+    vsprintf(buffer,format, args);
+    va_end(args);
 
-    Serial.print(msg1);
-    Serial.println(msg2);
-
-    if (level > LOG_INFO)
-    {
-        Serial4.print(msg1);
-        Serial4.println(msg2);
-    }
-}
-
-void datalog(const char* msg1, const char* msg2, const char* msg3, int level)
-{
-    sdCardPrint(msg1);
-    sdCardPrint(msg2);
-    sdCardPrintln(msg3);
-
-    Serial.print(msg1);
-    Serial.print(msg2);
-    Serial.println(msg3);
-
-    if (level > LOG_INFO)
-    {
-        Serial4.print(msg1);
-        Serial4.print(msg2);
-        Serial4.println(msg3);
-    }
-}
-
-void datalog(const char* msg1, const int msg2, int level)
-{
-    char buffer[11];
-    itoa(msg2, buffer, 10);
-
-    datalog(msg1, buffer, level);
-}
-
-void datalog(const char* msg1, const int msg2, const int msg3, int level)
-{
-    char buffer[11];
-    char buffer2[12];
-    itoa(msg2, buffer, 10);
-    itoa(msg3, buffer2+1, 10); // leave place for space char
-    buffer2[0] = ' ';
-
-    datalog(msg1, buffer, buffer2, level);
+    sdCardPrint(buffer);
+    Serial.print(buffer);
+    Serial4.println(buffer);
 }

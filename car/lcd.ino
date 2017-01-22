@@ -13,7 +13,7 @@ Adafruit_SSD1306 display(-1); // no reset pin
 void lcdSetup()
 {
     Wire1.begin(I2C_MASTER, 0, I2C_PINS_37_38, I2C_PULLUP_EXT, 400000); // enable LCD comm
-    
+
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C
 
     // Show image buffer on the display hardware.

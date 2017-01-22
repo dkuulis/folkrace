@@ -9,7 +9,7 @@ int processButtonEvent(unsigned long time, int buttonEvent, int mode)
 
     if (buttonEvent == BUTTON_PRESS)
     {
-        datalog("Button pressed", LOG_WARNING);
+        message("Button pressed\n");
 
         switch (mode)
         {
@@ -28,6 +28,9 @@ int processButtonEvent(unsigned long time, int buttonEvent, int mode)
             case MODE_RUN:
                 return MODE_IDLE;
 
+            case MODE_RUNOFF:
+                return MODE_IDLE;
+
             case MODE_SONAR:
                 return MODE_IDLE;
 
@@ -35,11 +38,11 @@ int processButtonEvent(unsigned long time, int buttonEvent, int mode)
                 return MODE_IDLE;
 
             default:
-                datalog("Unknown mode", LOG_ERROR);
+                message("Unknown mode %i\n", mode);
                 return MODE_IDLE;
         }
     }
-    
+
     return mode;
 }
 
@@ -62,15 +65,20 @@ int processMode(unsigned long time, int mode)
 
             case MODE_READY:
                 next = time + READY_TIMEOUT;
-                datalog("Starting timout", LOG_WARNING);
+                message("Starting timout\n");
                 break;
 
             case MODE_COUNTDOWN:
                 next = time + COUNTDOWN_INTERVAL;
-                datalog("Starting countdown", LOG_WARNING);
+                message("Starting countdown\n");
                 break;
 
             case MODE_RUN:
+                break;
+
+            case MODE_RUNOFF:
+                next = time + RUNOFF_INTERVAL;
+                message("Breaking\n");
                 break;
 
             case MODE_SONAR:
@@ -80,7 +88,7 @@ int processMode(unsigned long time, int mode)
                 break;
 
             default:
-                datalog("Unknown mode", LOG_ERROR);
+                message("Unknown mode %i\n", mode);
         }
 
         previous = mode;
@@ -99,15 +107,19 @@ int processMode(unsigned long time, int mode)
                 return mode;
 
             case MODE_READY:
-                datalog("Ready timeout", LOG_WARNING);
+                message("Ready timeout\n");
                 return MODE_IDLE;
 
             case MODE_COUNTDOWN:
-                datalog("Starting run", LOG_WARNING);
+                message("Starting run\n");
                 return MODE_RUN;
 
             case MODE_RUN:
                 return mode;
+
+            case MODE_RUNOFF:
+                message("Stopped\n");
+                return MODE_IDLE;
 
             case MODE_SONAR:
                 return mode;
@@ -116,7 +128,7 @@ int processMode(unsigned long time, int mode)
                 return mode;
 
             default:
-                datalog("Unknown mode", LOG_ERROR);
+                message("Unknown mode %i\n", mode);
                 return MODE_IDLE;
         }
     }
@@ -133,79 +145,88 @@ int processCommand(unsigned long time, char* command, int mode)
 
     if (strcmp(command, "idle") == 0)
     {
-        datalog("Mode - idle", LOG_WARNING);
+        message("Mode - idle\n");
         return MODE_IDLE;
     }
     else
     if (strcmp(command, "blink") == 0)
     {
-        datalog("Mode - blink", LOG_WARNING);
+        message("Mode - blink\n");
         return MODE_BLINK;
     }
     else
     if (strcmp(command, "ready") == 0)
     {
-        datalog("Mode - ready", LOG_WARNING);
+        message("Mode - ready\n");
         return MODE_READY;
     }
     else
     if (strcmp(command, "countdown") == 0)
     {
-        datalog("Mode - countdown", LOG_WARNING);
+        message("Mode - countdown");
         return MODE_COUNTDOWN;
     }
     else
     if (strcmp(command, "run") == 0)
     {
-        datalog("Mode - run", LOG_WARNING);
+        message("Mode - run\n");
         return MODE_RUN;
+    }
+    else
+    if (strcmp(command, "runoff") == 0)
+    {
+        message("Mode - runoff\n");
+        return MODE_RUNOFF;
     }
     else
     if (strcmp(command, "sonar") == 0)
     {
-        datalog("Mode - sonar", LOG_WARNING);
+        message("Mode - sonar\n");
         return MODE_SONAR;
     }
     else
     if (strcmp(command, "imu") == 0)
     {
-        datalog("Mode - imu", LOG_WARNING);
+        message("Mode - imu\n");
         return MODE_IMU;
     }
     else
     if (memcmp(command, "dump", 4) == 0    )
     {
         dumpFile(command+4);
-        datalog("Dump done", LOG_WARNING);
+        message("Dump done\n");
+        return mode;
+    }
+    else
+    if (strcmp(command, "list") == 0    )
+    {
+        listFiles();
+        message("Listing done\n");
         return mode;
     }
     else
     if (strcmp(command, "ereset") == 0)
     {
-        datalog("Resetting EEPROM", LOG_WARNING);
         eepromAction(EEPROM_RESET);
-        datalog("Reset done", LOG_WARNING);
+        message("EEPROM reset done");
         return mode;
     }
     else
     if (strcmp(command, "eread") == 0)
     {
-        datalog("Reading EEPROM", LOG_WARNING);
         eepromAction(EEPROM_READ);
-        datalog("Read done", LOG_WARNING);
+        message("EEPROM read done\n");
         return mode;
     }
     else
     if (strcmp(command, "ewrite") == 0)
     {
-        datalog("Writing EEPROM", LOG_WARNING);
         eepromAction(EEPROM_WRITE);
-        datalog("Write done", LOG_WARNING);
+        message("EEPROM written\n");
         return mode;
     }
     if (strcmp(command, "eshow") == 0)
     {
-        datalog("Show EEPROM", LOG_WARNING);
         eepromAction(EEPROM_SHOW);
         return mode;
     }
@@ -216,7 +237,7 @@ int processCommand(unsigned long time, char* command, int mode)
     }
     else
     {
-        datalog("Unknown command ", command, LOG_ERROR);
+        message("Unknown command %s\n", command);
         return MODE_IDLE;
     }
 }

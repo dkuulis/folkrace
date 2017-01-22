@@ -49,8 +49,8 @@ void loop()
 }
 
 // accessor
-void setIdle()
+void endRun()
 {
-    mode = MODE_IDLE;
+    mode = MODE_RUNOFF;
 }
 

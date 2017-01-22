@@ -12,7 +12,7 @@ void eepromRW(int address, int defaultValue, int &var, int action)
     {
         short v;
         EEPROM.get(address, v);
-        if (v != -1) 
+        if (v != -1)
         {
             var = v;
         }
@@ -20,16 +20,16 @@ void eepromRW(int address, int defaultValue, int &var, int action)
         {
             var = defaultValue;
         }
-        datalog("EEPROM read ", address, var, LOG_WARNING);
+        info("EEPROM read %i %i\n", address, var);
     }
 
     if (action == EEPROM_WRITE)
     {
-        datalog("EEPROM write ", address, var, LOG_WARNING);
-        
+        message("EEPROM write %i %i\n", address, var);
+
         short v = var;
         EEPROM.update(address, v & 0xFF);
-        EEPROM.update(address+1, (v >> 8 ) & 0xFF);        
+        EEPROM.update(address+1, (v >> 8 ) & 0xFF);
     }
 
     if (action == EEPROM_RESET)
@@ -39,7 +39,7 @@ void eepromRW(int address, int defaultValue, int &var, int action)
 
     if (action == EEPROM_SHOW)
     {
-        datalog("EEPROM ", address, var, LOG_WARNING);
+        message("EEPROM %i %i\n", address, var);
     }
 }
 
@@ -47,19 +47,22 @@ void eepromRW(int address, int defaultValue, int &var, int action)
 void eepromAction(int action)
 {
      sdCardEeprom(action);
-     driveEeprom(action);
      steerEeprom(action);
+     driveEeprom(action);
+     sonarEeprom(action);
+     imuEeprom(action);
 }
 
 void eepromSet(const char* p)
 {
     int address;
     int value;
-    
-    sscanf(p, "%i %i", &address, &value); 
 
-    datalog("Set EEPROM ", address, value, LOG_WARNING);
+    sscanf(p, "%i %i", &address, &value);
+
+    message("Set EEPROM %i %i\n", address, value);
     eepromRW(address, 0, value, EEPROM_WRITE);
-    
+
     eepromAction(EEPROM_READ);
+    message("EEPROM reloaded\n");
 }
