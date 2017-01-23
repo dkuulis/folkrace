@@ -62,7 +62,7 @@
 #define SONAR5_ECHO_PIN 10
 
 #define SONAR_NUM 1 // 5 // Number or sensors
-#define MAX_DISTANCE 200 // Maximum distance (in cm) to ping
+#define MAX_DISTANCE 500 // Maximum distance (in cm) to ping
 #define PING_INTERVAL 33 // Milliseconds between sensor pings (29ms is about the min to avoid cross-sensor echo)
 
 #define EEPROM_PING_INTERVAL 40
