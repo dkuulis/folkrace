@@ -4,8 +4,7 @@
 //Creative Commons non commercial
 
 module hcsr04() {
-    difference()
-    {
+    //difference() {
         union()
         {
             color("DARKBLUE") cube([45,20,1.2]);
@@ -13,16 +12,18 @@ module hcsr04() {
             translate([16/2+27+1,18/2+1,1.3]) ultrasonicSensor();
             color("SILVER") translate([45/2-3.25,20-4,1.3]) xtal();
 
-            // pins are removed 
-            //translate([(45/2)-((2.45*4)/2)+0.6,2,-0.2]) rotate([180,0,0]) headerPin(4);
+            translate([(45/2)-((2.45*4)/2)+0.6,2,-0.2]) rotate([180,0,0]) headerPin(4);
         }
 
+        // removing screw cutouts to improve rendering
+        /*
         union()
         {
             color("DARKBLUE") translate([2.5,2.5,-1]) cylinder(d=2, h=3);
             color("DARKBLUE") translate([2.5+40,2.5+15,-1]) cylinder(d=2, h=3);
         }
-    }
+
+    } */
 }
 
 module ultrasonicSensor()
@@ -51,7 +52,7 @@ module xtal()
         translate([0,0,0]) cylinder(d=4.65, h=0.4);
         translate([6.5,0,0]) cylinder(d=4.65, h=0.4);
     }
-    
+
     //Body
     hull()
     {

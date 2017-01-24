@@ -83,12 +83,13 @@ module mount(extra = 7) {
 }
 
 // horizantaly mounted sonar
-module horizontal_sonar() {
+module horizontal_sonar(extra = 7, upside = false) {
 
     // horizontal sonar
-    translate ([0, -45/2, 0]) rotate([90, 0, 90]) hcsr04();
+    translate ([0, 0, upside ? extra+12.5 : 0]) rotate([upside ? 180 : 0, 0, 0]) 
+        translate ([0, -45/2, extra-7]) rotate([90, 0, 90]) hcsr04();
 
-    mount();
+    translate ([0, 0, extra-7]) mount(extra);
 
     // sonar ray
     //color("white") translate ([20+1000/2, 0, 10]) rotate([0, 90, 0]) cylinder(d1=40, d2=520,h=1000, center=true);

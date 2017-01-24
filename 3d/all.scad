@@ -14,7 +14,13 @@ module all()
     apex();
     platform();
     board();
-    arrange(30) horizontal_sonar();
+    arrange(30) {
+        horizontal_sonar(15, false);
+        horizontal_sonar(7, true);
+        horizontal_sonar(7, true );
+        horizontal_sonar(7, false);
+        horizontal_sonar(7, false);
+    }
     color("white") cage(mode=2/*simple*/);
     esc();
     lcd();
