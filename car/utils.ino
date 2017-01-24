@@ -13,12 +13,17 @@ void setupFail(const char *msg)
 }
 
 // log but not to BT
-void info(const char * format, ...)
+void info(const unsigned long time, const char * format, ...)
 {
     char buffer[256];
+
+    ultoa(time, buffer, 10);
+    char* p = buffer + strlen(buffer);
+    *p++ = ' ';
+
     va_list args;
     va_start(args, format);
-    vsprintf(buffer,format, args);
+    vsprintf(p,format, args);
     va_end(args);
 
     sdCardPrint(buffer);
@@ -26,12 +31,17 @@ void info(const char * format, ...)
 }
 
 // log everywhere
-void message(const char * format, ...)
+void message(const unsigned long time, const char * format, ...)
 {
     char buffer[256];
+
+    ultoa(time, buffer, 10);
+    char* p = buffer + strlen(buffer);
+    *p++ = ' ';
+
     va_list args;
     va_start(args, format);
-    vsprintf(buffer,format, args);
+    vsprintf(p,format, args);
     va_end(args);
 
     sdCardPrint(buffer);

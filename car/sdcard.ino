@@ -20,7 +20,7 @@ void sdCardSetup()
         setupFail("Card failed, or not present");
     }
 
-    openLog();
+    openLog(0);
 }
 
 void formatName(int nr)
@@ -31,27 +31,26 @@ void formatName(int nr)
     strcat(logname, ".txt");
 }
 
-void sdCardEeprom(int action)
+void sdCardEeprom(int action, const unsigned long time)
 {
-    eepromRW(EEPROM_LOG_ID, 1, log_id, action);
+    eepromRW(EEPROM_LOG_ID, 1, log_id, action, time);
 }
 
 // find unused logfile name
-void findName()
+void findName(const unsigned long time)
 {
-    sdCardEeprom(EEPROM_READ);
+    sdCardEeprom(EEPROM_READ, time);
     do
     {
         formatName(log_id);
         log_id += 1;
-        message("Trying logfile %s\n", logname);
     } while (SD.exists(logname));
-    sdCardEeprom(EEPROM_WRITE);
+    sdCardEeprom(EEPROM_WRITE, time);
 }
 
-void openLog()
+void openLog(const unsigned long time)
 {
-    findName();
+    findName(time);
 
     // open the file. note that only one file can be open at a time,
     // so you have to close this one before opening another.
@@ -60,7 +59,11 @@ void openLog()
     // check if file is opened
     if (!logFile)
     {
-        message("Failed to open %s\n", logname);
+        message(time, "Failed to open %s\n", logname);
+    }
+    else
+    {
+        message(time, "Logging %s\n", logname);        
     }
 }
 
@@ -82,7 +85,7 @@ void closeLog()
     }
 }
 
-void dumpFile(const char* command)
+void dumpFile(const char* command, const unsigned long time)
 {
     closeLog();
 
@@ -100,7 +103,7 @@ void dumpFile(const char* command)
     // if the file is available, read from it:
     if (dataFile)
     {
-        message("Dumping %s\n", logname);
+        message(time, "Dumping %s\n", logname);
         Serial.println("------------------------");
         while (dataFile.available())
         {
@@ -111,30 +114,13 @@ void dumpFile(const char* command)
     }
     else
     {
-        message("Cannot dump %s\n", logname);
+        message(time, "Cannot dump %s\n", logname);
     }
 
-    openLog();
+    openLog(time);
 }
 
-void listFiles()
+void listFiles(const unsigned long time)
 {
-    /*
-    if (!card.init(SPI_HALF_SPEED, SDCARD_CS))
-    {
-        setupFail("Card failed, or not present");
-    }
-
-    if (!volume.init(card))
-    {
-        setupFail("Could not find FAT partition");
-        return;
-    }
-
-    SdFile root;
-    root.openRoot(volume);
-    root.ls(LS_SIZE, 2);
-    root.close();
-    */
 }
 

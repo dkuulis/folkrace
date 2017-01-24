@@ -16,12 +16,12 @@ NewPing sonar[SONAR_NUM] =
 
 void sonarSetup()
 {
-    sonarEeprom(EEPROM_READ);
+    sonarEeprom(EEPROM_READ, 0);
 }
 
-void sonarEeprom(int action)
+void sonarEeprom(int action, const unsigned long time)
 {
-    eepromRW(EEPROM_PING_INTERVAL, PING_INTERVAL, pingInterval, action);
+    eepromRW(EEPROM_PING_INTERVAL, PING_INTERVAL, pingInterval, action, time);
 }
 
 static int currentSensor = 0;
@@ -40,7 +40,7 @@ void sonarLoop(unsigned long time, int mode)
         if (mode == MODE_SONAR || mode == MODE_RUN || mode == MODE_COUNTDOWN || mode == MODE_RUNOFF)
         {
             // report prev result
-            info("Sonar %i = %i cm @ %lu\n", currentSensor, distance[currentSensor], time);
+            info(time, "Sonar %i = %i cm\n", currentSensor, distance[currentSensor]);
         }
 
         // set up next ping time

@@ -6,7 +6,7 @@ void eepromSetup()
 {
 }
 
-void eepromRW(int address, int defaultValue, int &var, int action)
+void eepromRW(int address, int defaultValue, int &var, int action, const unsigned long time)
 {
     if (action == EEPROM_READ)
     {
@@ -20,12 +20,12 @@ void eepromRW(int address, int defaultValue, int &var, int action)
         {
             var = defaultValue;
         }
-        info("EEPROM read %i %i\n", address, var);
+        info(time, "EEPROM read %i %i\n", address, var);
     }
 
     if (action == EEPROM_WRITE)
     {
-        message("EEPROM write %i %i\n", address, var);
+        message(time, "EEPROM write %i %i\n", address, var);
 
         short v = var;
         EEPROM.update(address, v & 0xFF);
@@ -39,30 +39,30 @@ void eepromRW(int address, int defaultValue, int &var, int action)
 
     if (action == EEPROM_SHOW)
     {
-        message("EEPROM %i %i\n", address, var);
+        message(time, "EEPROM %i %i\n", address, var);
     }
 }
 
 // perform action (r/w/reset/show) for all know addresses
-void eepromAction(int action)
+void eepromAction(int action, const unsigned long time)
 {
-     sdCardEeprom(action);
-     steerEeprom(action);
-     driveEeprom(action);
-     sonarEeprom(action);
-     imuEeprom(action);
+     sdCardEeprom(action, time);
+     steerEeprom(action, time);
+     driveEeprom(action, time);
+     sonarEeprom(action, time);
+     imuEeprom(action, time);
 }
 
-void eepromSet(const char* p)
+void eepromSet(const char* p, const unsigned long time)
 {
     int address;
     int value;
 
     sscanf(p, "%i %i", &address, &value);
 
-    message("Set EEPROM %i %i\n", address, value);
-    eepromRW(address, 0, value, EEPROM_WRITE);
+    message(time, "Set EEPROM %i %i\n", address, value);
+    eepromRW(address, 0, value, EEPROM_WRITE, time);
 
-    eepromAction(EEPROM_READ);
-    message("EEPROM reloaded\n");
+    eepromAction(EEPROM_READ, time);
+    message(time, "EEPROM reloaded\n");
 }

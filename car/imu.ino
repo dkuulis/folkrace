@@ -19,7 +19,7 @@ void imuSetup()
         setupFail("IMU initialization unsuccessful");
     }
 
-    imuEeprom(EEPROM_READ);
+    imuEeprom(EEPROM_READ, 0);
 
     float b[18] = {
             -0.66359285f-0.13f, 0.596398637f, 0.149558031f,  // accel bias
@@ -36,9 +36,9 @@ void imuSetup()
     IMU.setBias(b);
 }
 
-void imuEeprom(int action)
+void imuEeprom(int action, const unsigned long time)
 {
-    eepromRW(EEPROM_IMU_INTERVAL, IMU_INTERVAL, imuInterval, action);
+    eepromRW(EEPROM_IMU_INTERVAL, IMU_INTERVAL, imuInterval, action, time);
 }
 
 void imuLoop(unsigned long time, int mode)
@@ -81,8 +81,7 @@ void printData(unsigned long time)
 
     toEulerianAngle(q, roll, pitch, yaw);
 
-    info("IMU %lu a %f %f %f g %f %f %f m %f %f %f q %f %f %f %f roll %f pitch %f yaw %f d %f\n",
-        time,
+    info(time, "IMU a %f %f %f g %f %f %f m %f %f %f q %f %f %f %f roll %f pitch %f yaw %f d %f\n",
         d[0], d[1], d[2], // accel
         d[3], d[4], d[5], // gyro
         d[6], d[7], d[8], // magnetometer

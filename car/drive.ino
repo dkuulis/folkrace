@@ -27,7 +27,7 @@ void driveSetup()
     driveServo.attach(DRIVE_PIN);
     Wire2.begin(I2C_MASTER, 0,  I2C_PINS_3_4, I2C_PULLUP_EXT, 100000);  // enable ESC I2C
 
-    driveEeprom(EEPROM_READ);
+    driveEeprom(EEPROM_READ, 0);
 
     drive = driveZero;
     driveServo.writeMicroseconds(drive);
@@ -46,12 +46,12 @@ void driveLoop(unsigned long time, int mode)
 
         if (old != drive)
         {
-            message("Driving %i\n", drive);
+            message(time, "Driving %i\n", drive);
             driveServo.writeMicroseconds(drive);
         }
 
         // do steering
-        steerLoop();
+        steerLoop(time);
     }
 }
 
@@ -89,17 +89,17 @@ void driveSubmodeLoop(unsigned long time, int mode)
             switch (submode)
             {
                 case SUBMODE_RUN:
-                    message("Slowing dist %i @ %lu\n", freespace, time);
+                    message(time, "Slowing %i\n", freespace);
                     submode = SUBMODE_SLOW;
                     break;
 
                 case SUBMODE_SLOW:
-                    message("Stopping dist %i @ %lu\n", freespace, time);
+                    message(time, "Stopping %i\n", freespace);
                     submode = SUBMODE_IDLE;
                     break;
 
                 case SUBMODE_IDLE:
-                    message("?? idle submode ??\n");
+                    message(time, "??idlesubmode??\n");
                     break;
             }
         }
@@ -107,7 +107,7 @@ void driveSubmodeLoop(unsigned long time, int mode)
         {
             if (submode != SUBMODE_RUN)
             {
-                message("Resuming run %i @ %lu\n", freespace, time);
+                message(time, "Resuming %i\n");
                 submode = SUBMODE_RUN; // we have space...
             }
         }
@@ -148,13 +148,14 @@ void speedLoop(unsigned long time, int mode)
     }
 }
 
-void driveEeprom(int action)
+void driveEeprom(int action, const unsigned long time)
 {
-    eepromRW(EEPROM_DRIVE_ZERO, DRIVE_ZERO, driveZero, action);
-    eepromRW(EEPROM_DRIVE_MIN, DRIVE_MIN, driveMin, action);
-    eepromRW(EEPROM_DRIVE_MAX, DRIVE_MAX, driveMax, action);
-    eepromRW(EEPROM_DRIVE_INTERVAL, DRIVE_INTERVAL, driveInterval, action);
-    eepromRW(EEPROM_SPEED_INTERVAL, SPEED_INTERVAL, speedInterval, action);
-    eepromRW(EEPROM_DRIVE_SLOW_FORWARD, DRIVE_SLOW_FORWARD, driveSlowForward, action);
-    eepromRW(EEPROM_DRIVE_SLOW_BACKWARD, DRIVE_SLOW_BACKWARD, driveSlowBackward, action);
-    eepromRW(EEPROM_DRIVE_RANGE, DRIVE_RANGE, driveRange, action);}
+    eepromRW(EEPROM_DRIVE_ZERO, DRIVE_ZERO, driveZero, action, time);
+    eepromRW(EEPROM_DRIVE_MIN, DRIVE_MIN, driveMin, action, time);
+    eepromRW(EEPROM_DRIVE_MAX, DRIVE_MAX, driveMax, action, time);
+    eepromRW(EEPROM_DRIVE_INTERVAL, DRIVE_INTERVAL, driveInterval, action, time);
+    eepromRW(EEPROM_SPEED_INTERVAL, SPEED_INTERVAL, speedInterval, action, time);
+    eepromRW(EEPROM_DRIVE_SLOW_FORWARD, DRIVE_SLOW_FORWARD, driveSlowForward, action, time);
+    eepromRW(EEPROM_DRIVE_SLOW_BACKWARD, DRIVE_SLOW_BACKWARD, driveSlowBackward, action, time);
+    eepromRW(EEPROM_DRIVE_RANGE, DRIVE_RANGE, driveRange, action, time);
+}

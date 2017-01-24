@@ -14,26 +14,26 @@ void steerSetup()
 {
     steerServo.attach(STEER_PIN);
 
-    steerEeprom(EEPROM_READ);
+    steerEeprom(EEPROM_READ, 0);
 
     steer = steerZero;
     steerServo.writeMicroseconds(steer);
 }
 
 // invoked from drive loop
-void steerLoop()
+void steerLoop(const unsigned long time)
 {
     if (steer != steerZero) // TODO - temp code
     {
         steer = steerZero;
-        message("Steering %i\n", steer);
+        message(time, "Steering %i\n", steer);
         steerServo.writeMicroseconds(steer);
     }
 }
 
-void steerEeprom(int action)
+void steerEeprom(int action, const unsigned long time)
 {
-    eepromRW(EEPROM_STEER_ZERO, STEER_ZERO, steerZero, action);
-    eepromRW(EEPROM_STEER_MIN, STEER_MIN, steerMin, action);
-    eepromRW(EEPROM_STEER_MAX, STEER_MAX, steerMax, action);
+    eepromRW(EEPROM_STEER_ZERO, STEER_ZERO, steerZero, action, time);
+    eepromRW(EEPROM_STEER_MIN, STEER_MIN, steerMin, action, time);
+    eepromRW(EEPROM_STEER_MAX, STEER_MAX, steerMax, action, time);
 }
