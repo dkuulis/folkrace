@@ -267,13 +267,13 @@ int MPU9250::setFilter(mpu9250_dlpf_bandwidth bandwidth, uint8_t srd)
             break;
 
         case DLPF_BANDWIDTH_10HZ:
-            accelBandwidth = ACCEL_DLPF_5;
-            gyroBandwidth = GYRO_DLPF_5;
+            accelBandwidth = ACCEL_DLPF_10;
+            gyroBandwidth = GYRO_DLPF_10;
             break;
 
         case DLPF_BANDWIDTH_5HZ:
-            accelBandwidth = ACCEL_DLPF_20;
-            gyroBandwidth = GYRO_DLPF_20;
+            accelBandwidth = ACCEL_DLPF_5;
+            gyroBandwidth = GYRO_DLPF_5;
             break;
 
         default:
@@ -376,7 +376,7 @@ void MPU9250::getMotion10Counts(int16_t* res)
     update = us;
 }
 
-void MPU9250::getMotion10(float* res)
+void MPU9250::getMotion10(volatile float* res)
 {
     int16_t buff[10];
 
@@ -398,7 +398,7 @@ void MPU9250::getMotion10(float* res)
     res[TEMPERATURE] = ((((float) buff[TEMPERATURE]) - TEMPERATURE_OFFSET) * TEMPERATURE_SCALE) + TEMPERATURE_OFFSET; // t
 }
 
-void MPU9250::getMotion10Unbiased(float* res)
+void MPU9250::getMotion10Unbiased(volatile float* res)
 {
     getMotion10(res);
 

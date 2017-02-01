@@ -60,8 +60,8 @@ class MPU9250
         int begin(mpu9250_accel_range accelRange, mpu9250_gyro_range gyroRange);
         int setFilter(mpu9250_dlpf_bandwidth bandwidth, uint8_t srd);
 
-        void getMotion10Unbiased(float* res);
-        void getMotion10(float* res);
+        void getMotion10Unbiased(volatile float* res);
+        void getMotion10(volatile float* res);
         void getMotion10Counts(int16_t* res);
 
         void setBias(float* b);
