@@ -19,7 +19,7 @@ module arrange(a) {
 }
 
 // 3d printed platform to be attached to shock towers
-module platform() {
+module platform(rigid = false) {
 
     color("black") difference()
     {
@@ -30,7 +30,7 @@ module platform() {
                 {
 
                     // basic plate
-                    #linear_extrude(height = 3)
+                    #linear_extrude(height = 4)
                         difference()
                         {
                             intersection()
@@ -44,19 +44,20 @@ module platform() {
                             }
 
                             // central hole
-                            translate ([-12.5, 0, 0])
-                                offset(-5) offset(10) offset(-5) // rounded corners
-                                    polygon([
-                                     // left
-                                     [-45,-20], [-31,-37], // bevel around [-45,-35],
-                                     [ 32,-37], [ 45,-27], // bevel around [45,-35],
+                            if (!rigid)
+                                translate ([-12.5, 0, 0])
+                                    offset(-5) offset(10) offset(-5) // rounded corners
+                                        polygon([
+                                         // left
+                                         [-45,-20], [-31,-37], // bevel around [-45,-35],
+                                         [ 32,-37], [ 45,-27], // bevel around [45,-35],
 
-                                     [48,-27], [48,27],
+                                         [48,-27], [48,27],
 
-                                     // right
-                                     [ 45, 27], [ 32, 37], // bevel around [45,35],
-                                     [-31, 37], [-45, 20]  // bevel around [-45,35]
-                                    ]);
+                                         // right
+                                         [ 45, 27], [ 32, 37], // bevel around [45,35],
+                                         [-31, 37], [-45, 20]  // bevel around [-45,35]
+                                        ]);
 
                             // wire tie holes
                             #translate ([-45, -45, 0]) circle(d=5);
@@ -109,39 +110,84 @@ module platform() {
                 {
                     translate ([48-12.5-5, 23, 0]) cylinder(d=6, h=20, center=true);
                     translate ([54-12.5,   23, 0]) cylinder(d=6, h=20, center=true);
+                    translate ([48-12.5-5, 23-4, 0]) cylinder(d=6, h=20, center=true);
+                    translate ([54-12.5,   23-4, 0]) cylinder(d=6, h=20, center=true);
                 }
 
-                // esc motor wires
+                // esc motor wires + servo
                 #hull()
                 {
                     translate ([48-12.5-5, -23,   0]) cylinder(d=6, h=20, center=true);
                     translate ([54-12.5,   -23+4, 0]) cylinder(d=6, h=20, center=true);
                     translate ([54-12.5,   -23,   0]) cylinder(d=6, h=20, center=true);
-                    translate ([48-12.5,   -23+4, 0]) cylinder(d=6, h=20, center=true);
+                    translate ([48-12.5-5, -23+4, 0]) cylinder(d=6, h=20, center=true);
                 }
 
                 // space save
-                #hull() {
-                    translate ([52, -10, 0]) cylinder(d=5, h=20, center=true);
-                    translate ([42, -10, 0]) cylinder(d=5, h=20, center=true);
-                    translate ([42,  10, 0]) cylinder(d=5, h=20, center=true);
-                    translate ([52,  10, 0]) cylinder(d=5, h=20, center=true);
-                }
+                if (!rigid)
+                    #hull() {
+                        translate ([52, -10, 0]) cylinder(d=5, h=20, center=true);
+                        translate ([42, -10, 0]) cylinder(d=5, h=20, center=true);
+                        translate ([42,  10, 0]) cylinder(d=5, h=20, center=true);
+                        translate ([52,  10, 0]) cylinder(d=5, h=20, center=true);
+                    }
 
                 // space save
-                #hull()
-                {
-                    translate ([-72, -10, 0]) cylinder(d=5, h=20, center=true);
-                    translate ([-67, -10, 0]) cylinder(d=5, h=20, center=true);
-                    translate ([-67,  10, 0]) cylinder(d=5, h=20, center=true);
-                    translate ([-72,  10, 0]) cylinder(d=5, h=20, center=true);
-                }
+                if (!rigid)
+                    #hull()
+                    {
+                        translate ([-72, -10, 0]) cylinder(d=5, h=20, center=true);
+                        translate ([-67, -10, 0]) cylinder(d=5, h=20, center=true);
+                        translate ([-67,  10, 0]) cylinder(d=5, h=20, center=true);
+                        translate ([-72,  10, 0]) cylinder(d=5, h=20, center=true);
+                    }
 
                 // board mount holes
-                #translate ([-(45-2.5)-10,  (35-2.5), 2.5]) screw2x6bore();
-                #translate ([-(45-2.5)-10, -(35-2.5), 2.5]) screw2x6bore();
-                #translate ([ (45-2.5)-10,  (35-2.5), 2.5]) screw2x6bore();
-                #translate ([ (45-2.5)-10, -(35-2.5), 2.5]) screw2x6bore();
+                if (rigid) {
+                    #translate ([-(45-2.5)-10,  (35-2.5), 0.5]) rotate([180, 0, 0]) screw2x6bore();
+                    #translate ([-(45-2.5)-10, -(35-2.5), 0.5]) rotate([180, 0, 0]) screw2x6bore();
+                    #translate ([ (45-2.5)-10,  (35-2.5), 0.5]) rotate([180, 0, 0]) screw2x6bore();
+                    #translate ([ (45-2.5)-10, -(35-2.5), 0.5]) rotate([180, 0, 0]) screw2x6bore();
+                }
+                else {
+                    #translate ([-(45-2.5)-10,  (35-2.5), 2.5]) screw2x6bore();
+                    #translate ([-(45-2.5)-10, -(35-2.5), 2.5]) screw2x6bore();
+                    #translate ([ (45-2.5)-10,  (35-2.5), 2.5]) screw2x6bore();
+                    #translate ([ (45-2.5)-10, -(35-2.5), 2.5]) screw2x6bore();
+                }
+                
+                // solder detail space
+                if (rigid) {
+                    translate ([-10, 0, 2]) 
+                        #linear_extrude(height = 3)
+                            offset(-2) offset(4) offset(-2) // rounded corners
+                                polygon(
+                                    points=[
+                                        [-38,-32],[30,-32],[30,32],[-38,32], // outer
+                                        [-15,-7],[20,-7],[20,3],[-15,3], // sub-teensy
+                                        [-3,15],[30,15],[30,32],[-3,32] // free corner
+                                    ],
+                                    paths=[
+                                        [0,1,2,3],
+                                        [4,5,6,7],
+                                        [8,9,10,11]
+                                    ],
+                                    convexity=10
+                                );
+                    translate ([-10, 0, 3]) 
+                        #linear_extrude(height = 2)
+                            offset(1) offset(-0.5) // rounded corners
+                                polygon(
+                                    points=[
+                                        [-45,-35],[45,-35],[45,35],[-45,35] // outer
+                                    ],
+                                    paths=[
+                                        [0,1,2,3],
+                                    ],
+                                    convexity=2
+                                );
+                }
+                
 
                 // mount holes
                 // front
@@ -179,4 +225,6 @@ module platform() {
     }
 }
 
-platform();
+//platform();
+platform(true);
+//rotate([0,0,180]) projection(cut=true) translate ([0, 0, -51]) platform(true);

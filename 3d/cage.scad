@@ -109,7 +109,7 @@ module cage_pin(p1, p2, d, pd, ph, mode)
     difference() {
         #rod(p1, p2, d);
 
-        translate ([0,0,-ph])
+        #translate ([0,0,-ph])
             translate (p1)
                 rotate([0,90,0])
                     cylinder(d=pd, h=2*d, center=true); // pin hole
@@ -135,11 +135,11 @@ module cage(mode = 0)
     n = 4;
     db = 6;
     hb = d;
-    pd = 1;
-    ph = d/2 + 3 /*platform*/+ 1/*freespace*/;
+    pd = 1.5;
+    ph = d/2 + 4.5; // (3.5 for thin platform)
 
     // measurements
-    top = 82;
+    top = 87;
 
     top_side = 30;
 

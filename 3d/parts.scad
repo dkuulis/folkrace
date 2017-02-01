@@ -19,10 +19,12 @@ module board() {
 }
 
 module esc() {
-    translate ([33, -8, 79]) rotate([0, 0, 90]) {
-        color("green") cube(size=[36, 26, 2], center=true);
-        color("black") translate ([36/2, 0, 0]) rotate([0, 90, 0]) cylinder(d=8, h=16, center=false);
-    }
+//    translate ([33, -8, 79]) 
+    translate ([37, -2, 55]) 
+        rotate([0, 0, 90]) {
+            color("green") cube(size=[36, 26, 2], center=true);
+            color("black") translate ([36/2, 0, 0]) rotate([0, 90, 0]) cylinder(d=8, h=16, center=false);
+        }
 }
 
 module lcd() {
